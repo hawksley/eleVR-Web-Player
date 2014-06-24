@@ -1,0 +1,34 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='chrome=1')
+    meta(name='description', content='eleVR Web Player : A Web Player for 360 Video on the Oculus')
+    link(rel='stylesheet', type='text/css', media='screen', href='stylesheets/stylesheet.css')
+    title eleVR Web Player
+  body
+    //
+       HEADER 
+    #header_wrap.outer
+      header.inner
+        a#forkme_banner(href='https://github.com/hawksley/eleVR-Web-Player') View on GitHub
+        h1#project_title eleVR Web Player
+        h2#project_tagline A Web Player for 360 Video on the Oculus
+        section#downloads
+          a.zip_download_link(href='https://github.com/hawksley/eleVR-Web-Player/zipball/master') Download this project as a .zip file
+          a.tar_download_link(href='https://github.com/hawksley/eleVR-Web-Player/tarball/master') Download this project as a tar.gz file
+    //
+       MAIN CONTENT 
+    #main_content_wrap.outer
+      section#main_content.inner
+        include:md readme.md
+    //
+       FOOTER  
+    #footer_wrap.outer
+      footer.inner
+        p.copyright
+          | eleVR Web Player is maintained by
+          a(href='https://github.com/hawksley') hawksley
+        p
+          | Published with
+          a(href='http://pages.github.com') GitHub Pages
