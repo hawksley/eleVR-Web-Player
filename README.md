@@ -5,7 +5,7 @@ The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift fr
 
 eleVR Player was developed by [eleVR](http://eleVR.com), a project of the Communications Design Group, that is supported by SAP.
 
-It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections.
+It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections. eleVR Player comes bundled with two relatively small *.webm files, one for each projection. You can download larger mp4 files from the [eleVR Downloads Page](http://elevr.com/downloads/), as well as from other spherical video sources.
 
 The video can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift.
 
