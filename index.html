@@ -1,70 +1,121 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="description" content="eleVR Web Player : A Web Player for 360 Video on the Oculus"><link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css"><title>eleVR Web Player</title></head><body><!--HEADER --><div id="header_wrap" class="outer"><header class="inner"><a id="forkme_banner" href="https://github.com/hawksley/eleVR-Web-Player">View on GitHub</a><h1 id="project_title">eleVR Web Player</h1><h2 id="project_tagline">A Web Player for 360 Video on the Oculus</h2><section id="downloads"><a href="https://github.com/hawksley/eleVR-Web-Player/zipball/master" class="zip_download_link">Download this project as a .zip file</a><a href="https://github.com/hawksley/eleVR-Web-Player/tarball/master" class="tar_download_link">Download this project as a tar.gz file</a></section></header></div><!--MAIN CONTENT --><div id="main_content_wrap" class="outer"><section id="main_content" class="inner"><h1>eleVR Web Player</h1>
+<!--
+* eleVR Web Player: A web player for 360 video on the Oculus
+* Copyright (C) 2014 Andrea Hawksley and Andrew Lutomirski
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>eleVR Web Player</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="css/font-awesome.css">
+    <link rel="stylesheet" href="css/elevr-player.css">
+    <script src="lib/vr.js" type="text/javascript"></script>
+    <script src="lib/gl-matrix.js" type="text/javascript"></script>
+    <script src="js/elevr-player.js" type="text/javascript"></script>
 
-<p>The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the <a href="https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries">3rd Party Libraries</a> section.</p>
+    <!-- Fragment shader program -->
 
-<p>eleVR Player was developed by <a href="http://eleVR.com">eleVR</a>, a project of the Communications Design Group, that is supported by SAP.</p>
+    <script id="shader-fs" type="x-shader/x-fragment">
+      varying mediump vec3 vDirection;
+      uniform mediump float eye;
+      uniform mediump float projection;
 
-<p>It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections.</p>
+      uniform sampler2D uSampler;
 
-<p>The video can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift.</p>
+      #define PI 3.1415926535897932384626433832795
 
-<h3>Installation</h3>
+      mediump vec4 directionToColor(mediump vec3 direction, mediump float eye, mediump float projection) {
+        /* Input: a direction.  +x = right, +y = up, +z = backward.
+         *        an eye. left = 0, right = 1.
+         *        a projection. see ProjectionEnum in JS file for enum
+         * Output: a color from the video */
 
-<p>You will need to get the vr.js plugin in order to use the eleVR Web Player.
-Download it here: https://github.com/benvanik/vr.js/ and follow the installation instructions. Installation instructions for Mac appear to be for Safari. To install for Chrome or Firefox, follow the Windows Chrome/Firefox installation instructions.</p>
+        if (projection == 0.) {
+          /* Equirectangular projection */
+          mediump float theta = atan(direction.x, -1.0 * direction.z);
+          mediump float phi = atan(direction.y, length(direction.xz));
+          return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), phi / PI + 0.5));
+        } else if (projection == 1.) {
+          /* Equirectangular top/bottom 3D projection */
 
-<p>Following that, you should be able to run the web player without further action. If you do have issues, please read the <a href="https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#possible-issues-and-resolutions">issues section</a> below.</p>
+          mediump float theta = atan(direction.x, -1.0 * direction.z);
+          mediump float phi = atan(direction.y, length(direction.xz));
+          return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), ((phi / PI + 0.5) + eye)/ 2.));
+        }
+      }
 
-<h3>Support</h3>
+      void main(void) {
+        gl_FragColor = directionToColor(vDirection, eye, projection);
+      }
+    </script>
 
-<p>eleVR player should be supported on all browsers and systems that support the vr.js plugin.
-https://github.com/benvanik/vr.js/tree/master#supported-platforms</p>
+    <!-- Vertex shader program -->
 
-<h2>Running your own video</h2>
+    <script id="shader-vs" type="x-shader/x-vertex">
+      attribute mediump vec2 aVertexPosition;
 
-<p>The easiest way to run your own video is to click the folder icon and load your video from there. You may then need to choose the projection for your video from the projection selector.</p>
+      uniform mediump mat4 proj_inv;
 
-<p>You can load your own video from the javascript console, by typing loadVideo(&quot;0myVideo.mp4&quot;). If your video is equirectangular 2D, preface your video by 0. If it is stereo top/bottom, preface it by 1. These numbers correspond to the projections in the projectionEnum declaration in elevr-player.js.</p>
+      varying mediump vec3 vDirection;
 
-<p>If you want to add your video to the drop-down, create a new option in the html video-select element that looks like:
-&lt;option value=&quot;0myVideo.mp4&quot;&gt;My Video&lt;/option&gt;</p>
+      void main(void) {
+        gl_Position = vec4(aVertexPosition, 1.0, 1.0);
+        mediump vec4 projective_direction = proj_inv * gl_Position;
+        vDirection = projective_direction.xyz / projective_direction.w;
+      }
+    </script>
+  </head>
 
-<p>If you want your video to be the video loaded initially, change the source of the video in the html video tag. You can also update the starting projection, if necessary, by changing the value of the &quot;projection&quot; variable on instantiation (and also changing the default value of the projection-select html select tag.</p>
+  <body>
+    <div id="video-container">
+      <canvas id="glcanvas" style="position:absolute; top:0; bottom:0; right:0; left:0;">
+        Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
+      </canvas>
+      <video preload="auto" id="video" style="display:none;">
+        <source src="therelaxatron.webm" type='video/webm'>
+      </video>
+      <!-- Video Controls -->
+      <div id="control-hover-area">
+        <div id="video-controls">
+          <a id="play-pause" class="fa fa-play icon"></a>
 
-<h2>Possible Issues and Resolutions</h2>
 
-<h3>Unable to play video</h3>
+          <input type="range" id="seek-bar" value="0">
+          <!-- <input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1"> -->
 
-<p>If you download and run the code yourself, you need to serve the content to localhost before you can view video (due to <em>cross origin issues</em>). </p>
+          <a id="mute" class="fa fa-volume-up icon"></a>
 
-<p>Similarly, if you try to run your own video, you may run into <strong>cross origin</strong> issues if your video is not at the same origin the player. Take a look at <a href="https://developer.mozilla.org/en-US/docs/Web/WebGL/Cross-Domain_Textures">this doc</a> from mozilla if you run into these issues.</p>
+	        <a id="select-local-file" class="fa fa-folder-open icon rfloat"></a>
 
-<p>You may also run into issues playing video if your browser does not support HTML5 video of the type that you are using. For example, Firefox on Mac does not support mp4 video, but does support webm. You can check what video types are supported for your browser here: http://en.wikipedia.org/wiki/HTML5<em>video#Browser</em>support</p>
+          <select id="projection-select" class="rfloat">
+            <option value=0>Equirectangular</option>
+            <option value=1>Equirectangular 3D</option>
+          </select>
 
-<h3>Broken Time Slider in Chrome</h3>
+          <select id="video-select" class="rfloat">
+            <option value="0therelaxatron.webm">The Relaxatron</option>
+            <option value="1Vidcon.webm">Vidcon</option>
+          </select>
 
-<p>For the time slider to work in Chrome, you must use a server that understands <strong>partial content requests</strong>. Many of the most basic ways of serving to localhost do not.</p>
+          <a id="full-screen" class="fa fa-expand icon rfloat"></a>
+        </div>
+      </div>
 
-<h3>Oculus movement isn&#39;t being recognized</h3>
+      <script>runEleVRPlayer();</script>
+    </div>
 
-<p>I&#39;ve sometimes found the vr.js plugin to be buggy. If it isn&#39;t working with your Oculus, check that the results that you are getting from their raw data demo look correct: http://benvanik.github.io/vr.js/examples/raw_data.html</p>
-
-<p>You should see &quot;oculus rift detected&quot;, and a rotation that changes as you move the headset around. If you do not, first try closing all other oculus using software (only one app can use the oculus at once), then refresh/restart your browser.</p>
-
-<h3>The video is showing at the wrong resolution for my Oculus</h3>
-
-<p>The vr.js plugin seems to occasionally get confused about the resolution of the Oculus, I added two (commented) lines that you can use to force it to the correct resolution. Uncomment lines 2092 and 2093 of the lib/vr.js file to force the resolution to 1280x800. </p>
-
-<h2>Future Work</h2>
-
-<p>The following is a short subset of planned future work on the player.
-- Add additional projections
-- Clean up code to make it easier to drop in places
-- Pull webGL shaders out of the html file
-- Maybe add a non-oculus viewing variant</p>
-
-<h2>3rd party libraries</h2>
-
-<p>The following assets are used in this tool&#39;s creation.</p>
-
-<ul><li>vr.js - Apache License - https://github.com/benvanik/vr.js/</li><li>glMatrix - Similar to MIT License - http://glmatrix.net/</li><li>Font Awesome - MIT License - http://fortawesome.github.io/Font-Awesome/</li></ul></section></div><!--FOOTER  --><div id="footer_wrap" class="outer"><footer class="inner"><p class="copyright">eleVR Web Player is maintained by<a href="https://github.com/hawksley">hawksley</a></p><p>Published with<a href="http://pages.github.com">GitHub Pages</a></p></footer></div></body></html>
+</body></html>
