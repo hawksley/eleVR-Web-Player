@@ -51,7 +51,7 @@
           return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), phi / PI + 0.5));
         } else if (projection == 1.) {
           /* Equirectangular top/bottom 3D projection */
-
+          eye = 1. - eye;
           mediump float theta = atan(direction.x, -1.0 * direction.z);
           mediump float phi = atan(direction.y, length(direction.xz));
           return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), ((phi / PI + 0.5) + eye)/ 2.));
