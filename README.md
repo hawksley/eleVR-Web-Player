@@ -1,4 +1,4 @@
-eleVR-Web-Player
+eleVR Web Player
 ================
 
 The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section.
@@ -42,6 +42,14 @@ I've sometimes found the vr.js plugin to be buggy. If it isn't working with your
 You should see "oculus rift detected", and a rotation that changes as you move the headset around. If you do not, first try closing all other oculus using software (only one app can use the oculus at once), then refresh/restart your browser.
 ###The video is showing at the wrong resolution for my Oculus###
 The vr.js plugin seems to occasionally get confused about the resolution of the Oculus, I added two (commented) lines that you can use to force it to the correct resolution. Uncomment lines 2092 and 2093 of the lib/vr.js file to force the resolution to 1280x800. 
+
+## Future Work ##
+The following is a short subset of planned future work on the player.
+- Add additional projections
+- Clean up code to make it easier to drop in places
+- Pull webGL shaders out of the html file
+- Maybe add a non-oculus viewing variant
+- Investigate adding ability to load files from computer
 
 ## 3rd party libraries ##
 The following assets are used in this tool's creation.
