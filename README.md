@@ -3,7 +3,7 @@ eleVR Web Player
 
 The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section.
 
-eleVR Player was developed by [eleVR](http://eleVR.com), a project of the Communications Design Group, that is funded by SAP.
+eleVR Player was developed by [eleVR](http://eleVR.com), a project of the Communications Design Group, that is supported by SAP.
 
 It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections.
 
