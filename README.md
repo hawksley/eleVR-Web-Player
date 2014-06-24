@@ -1,21 +1,29 @@
 eleVR-Web-Player
 ================
 
-The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries noted in the 3rd Party Libraries section.
+The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section.
 
 It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections.
 
 The video can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift.
 
-### Installing ###
+### Installation ###
 You will need to get the vr.js plugin in order to use the eleVR Web Player.
 Download it here: https://github.com/benvanik/vr.js/ and follow the installation instructions. Installation instructions for Mac appear to be for Safari. To install for Chrome or Firefox, follow the Windows Chrome/Firefox installation instructions.
 
-Following that, you should be able to run the web player without further action. If you do have issues, please read the issues section below.
+Following that, you should be able to run the web player without further action. If you do have issues, please read the [issues section](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#possible-issues-and-resolutions) below.
 
 ### Support ###
 eleVR player should be supported on all browsers and systems that support the vr.js plugin.
 https://github.com/benvanik/vr.js/tree/master#supported-platforms
+
+## Running your own video ##
+You can load your own video from the javascript console, by typing loadVideo("0myVideo.mp4"). If your video is equirectangular 2D, preface your video by 0. If it is stereo top/bottom, preface it by 1. These numbers correspond to the projections in the projectionEnum declaration in elevr-player.js.
+
+If you want to add your video to the drop-down, create a new option in the html video-select element that looks like:
+<option value="0myVideo.mp4">My Video</option>
+
+If you want your video to be the video loaded initially, change the source of the video in the html video tag. You can also update the starting projection, if necessary, by changing the value of the "projection" variable on instantiation (and also changing the default value of the projection-select html select tag.
 
 ## Possible Issues and Resolutions ##
 ###Unable to play video###
