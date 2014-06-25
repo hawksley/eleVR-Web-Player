@@ -50,13 +50,13 @@ The vr.js plugin seems to occasionally get confused about the resolution of the 
 
 ## Future Work ##
 The following is a short subset of planned future work on the player.
+- Add a non-oculus viewing variant (rectangles...)
 - Add additional projections
 - Clean up code to make it easier to drop in places
 - Pull webGL shaders out of the html file
-- Add a non-oculus viewing variant
 
 ## 3rd party libraries ##
-The following assets are used in this tool's creation.
+The following assets are used by the eleVR Player:
 
 - vr.js - Apache License - https://github.com/benvanik/vr.js/
 - glMatrix - Similar to MIT License - http://glmatrix.net/
