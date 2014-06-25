@@ -1,17 +1,20 @@
 eleVR Web Player
 ================
 
-The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section.
+The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section. 
 
-eleVR Player was developed by [eleVR](http://eleVR.com), a project of the Communications Design Group, that is supported by SAP.
+Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift if the vr.js plugin is installed.
+
+#### [Go check out the demo!](http://hawksley.github.io/eleVR-Web-Player/) ####
+
+eleVR Player was developed by [eleVR](http://eleVR.com). eleVR is a project of the Communications Design Group and is supported by SAP. The contributors to the project are [@hawksley](https://github.com/hawksley) and [@amluto](https://github.com/amluto).
 
 It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections. eleVR Player comes bundled with two relatively small *.webm files, one for each projection. You can download larger mp4 files from the [eleVR Downloads Page](http://elevr.com/downloads/), as well as from other spherical video sources.
 
-The video can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift.
+### Installing the vr.js plugin ###
+You will need to get the vr.js plugin in order to use the eleVR Web Player with your Oculus Rift. If you just want to use the keyboard interface, no installation is necessary.
 
-### Installation ###
-You will need to get the vr.js plugin in order to use the eleVR Web Player.
-Download it here: https://github.com/benvanik/vr.js/ and follow the installation instructions. Installation instructions for Mac appear to be for Safari. To install for Chrome or Firefox, follow the Windows Chrome/Firefox installation instructions.
+Get the vr.js plugin here: https://github.com/benvanik/vr.js/ and follow the installation instructions. Installation instructions for Mac appear to be for Safari. To install for Chrome or Firefox, follow the Windows Chrome/Firefox installation instructions.
 
 Following that, you should be able to run the web player without further action. If you do have issues, please read the [issues section](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#possible-issues-and-resolutions) below.
 
@@ -47,14 +50,13 @@ The vr.js plugin seems to occasionally get confused about the resolution of the 
 
 ## Future Work ##
 The following is a short subset of planned future work on the player.
+- Add a non-oculus viewing variant (rectangles...)
 - Add additional projections
 - Clean up code to make it easier to drop in places
 - Pull webGL shaders out of the html file
-- Maybe add a non-oculus viewing variant
-
 
 ## 3rd party libraries ##
-The following assets are used in this tool's creation.
+The following assets are used by the eleVR Player:
 
 - vr.js - Apache License - https://github.com/benvanik/vr.js/
 - glMatrix - Similar to MIT License - http://glmatrix.net/

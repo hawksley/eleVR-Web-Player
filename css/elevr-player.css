@@ -26,6 +26,7 @@ body {
 #video-container {
   height:800px;
   width:1200px;
+  background-color: #000;
 }
 
 #video-controls {
