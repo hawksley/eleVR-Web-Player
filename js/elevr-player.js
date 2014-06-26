@@ -210,7 +210,7 @@ function drawOneEye(eye) {
 
 function drawScene(frameTime) {
   if (showTiming)
-    start = performance.now();
+    var start = performance.now();
 
   updateTexture();
   if (!vrloaded)
@@ -236,7 +236,8 @@ function drawScene(frameTime) {
   if (showTiming) {
     gl.finish();
     var end = performance.now();
-    console.log('Frame time: ' + (start - frameTime) + 'ms to drawScene + ' +
+    console.log('Frame time: ' +
+		(start - frameTime) + 'ms animation frame lag + ' +
                 (textureLoaded - start) + 'ms to load texture + ' +
                 (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
   }
