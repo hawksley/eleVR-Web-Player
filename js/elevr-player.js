@@ -161,7 +161,7 @@ function updateTexture() {
   if (textureTime !== video.currentTime) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB,
       gl.UNSIGNED_BYTE, video);
     gl.bindTexture(gl.TEXTURE_2D, null);
     textureTime = video.currentTime;
