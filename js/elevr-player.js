@@ -20,7 +20,7 @@
 "use strict";
 
 var container, canvas, video, playButton, muteButton, fullScreenButton,
-    seekBar, videoSelect, projectionSelect;
+    seekBar, videoSelect, projectionSelect, left, right;
 
 var gl, reqAnimFrameID = 0;
 
@@ -62,7 +62,7 @@ function runEleVRPlayer() {
 
   initWebGL(canvas);
   if (gl) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clearDepth(1.0);
     gl.disable(gl.DEPTH_TEST);
 
@@ -96,6 +96,8 @@ function runEleVRPlayer() {
  */
 function initElements() {
   container = document.getElementById("video-container");
+  left = document.getElementById("left");
+  right = document.getElementById("right");
   canvas = document.getElementById("glcanvas");
   video = document.getElementById("video");
 
@@ -312,6 +314,9 @@ function play() {
   if (video.ended) {
     video.currentTime = 0.1;
   }
+  left.style.display = "none";
+  right.style.display = "none";
+
   video.play();
   playButton.className = "fa fa-pause icon"
 
@@ -366,6 +371,12 @@ function selectLocalVideo() {
 
 function loadVideo(videoFile) {
   pause();
+  left.style.display = "block";
+  right.style.display = "block";
+
+      // gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
   if (reqAnimFrameID) {
     cancelAnimationFrame(reqAnimFrameID);
     reqAnimFrameID = 0;
