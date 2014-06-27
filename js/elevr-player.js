@@ -21,7 +21,6 @@
 
 var container, canvas, video, playButton, muteButton, fullScreenButton,
     seekBar, videoSelect, projectionSelect;
-    // volumeBar;
 
 var gl, reqAnimFrameID = 0;
 
@@ -107,7 +106,6 @@ function initElements() {
 
   // Sliders
   seekBar = document.getElementById("seek-bar");
-  // volumeBar = document.getElementById("volume-bar");
 
   // Selectors
   videoSelect = document.getElementById("video-select");
@@ -161,7 +159,7 @@ function updateTexture() {
   if (textureTime !== video.currentTime) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB,
       gl.UNSIGNED_BYTE, video);
     gl.bindTexture(gl.TEXTURE_2D, null);
     textureTime = video.currentTime;
@@ -210,7 +208,7 @@ function drawOneEye(eye) {
 
 function drawScene(frameTime) {
   if (showTiming)
-    start = performance.now();
+    var start = performance.now();
 
   updateTexture();
   if (!vrloaded)
@@ -236,7 +234,8 @@ function drawScene(frameTime) {
   if (showTiming) {
     gl.finish();
     var end = performance.now();
-    console.log('Frame time: ' + (start - frameTime) + 'ms to drawScene + ' +
+    console.log('Frame time: ' +
+		(start - frameTime) + 'ms animation frame lag + ' +
                 (textureLoaded - start) + 'ms to load texture + ' +
                 (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
   }
@@ -258,7 +257,7 @@ function initShaders() {
   gl.linkProgram(shaderProgram);
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert("Unable to initialize the shader program.");
+    alert("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
   }
 
   gl.useProgram(shaderProgram);

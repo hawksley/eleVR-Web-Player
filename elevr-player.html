@@ -21,14 +21,8 @@
   <head>
     <title>eleVR Web Player</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="css/font-awesome.css">
-    <link rel="stylesheet" href="css/elevr-player.css">
-    <script src="lib/vr.js" type="text/javascript"></script>
-    <script src="lib/gl-matrix.js" type="text/javascript"></script>
-    <script src="js/elevr-player.js" type="text/javascript"></script>
 
     <!-- Fragment shader program -->
-
     <script id="shader-fs" type="x-shader/x-fragment">
       varying mediump vec3 vDirection;
       uniform mediump float eye;
@@ -56,6 +50,9 @@
           mediump float phi = atan(direction.y, length(direction.xz));
           return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), ((phi / PI + 0.5) + eye)/ 2.));
         }
+        // Should work to resolve the 'not all control paths return a value, but doesn't
+        discard;
+        return vec4(0);
       }
 
       void main(void) {
@@ -64,7 +61,6 @@
     </script>
 
     <!-- Vertex shader program -->
-
     <script id="shader-vs" type="x-shader/x-vertex">
       attribute mediump vec2 aVertexPosition;
 
@@ -78,6 +74,12 @@
         vDirection = projective_direction.xyz / projective_direction.w;
       }
     </script>
+
+    <link rel="stylesheet" href="css/font-awesome.css">
+    <link rel="stylesheet" href="css/elevr-player.css">
+    <script src="lib/vr.js" type="text/javascript"></script>
+    <script src="lib/gl-matrix.js" type="text/javascript"></script>
+    <script src="js/elevr-player.js" type="text/javascript"></script>
   </head>
 
   <body>
@@ -95,7 +97,6 @@
 
 
           <input type="range" id="seek-bar" value="0">
-          <!-- <input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1"> -->
 
           <a id="mute" class="fa fa-volume-up icon"></a>
 
