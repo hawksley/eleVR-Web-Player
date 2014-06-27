@@ -50,6 +50,9 @@
           mediump float phi = atan(direction.y, length(direction.xz));
           return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), ((phi / PI + 0.5) + eye)/ 2.));
         }
+        // Should work to resolve the 'not all control paths return a value, but doesn't
+        discard;
+        return vec4(0);
       }
 
       void main(void) {
