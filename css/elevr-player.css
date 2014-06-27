@@ -23,10 +23,57 @@ body {
   font-weight: 300;
 }
 
+select {
+  border: none;
+  background: rgba(0,0,0,.6);
+  color: rgba(255,255,255,.8);
+  padding: 2px;
+  border-radius: 3px;
+}
+
+video {
+  display: none;
+}
+
+a {
+  cursor: pointer;
+  color: rgba(0,0,0,.5);
+}
+
+a:hover {
+  color: rgba(0,0,0,.65);
+}
+
+a:active {
+  color: rgba(0,0,0,.8);
+  text-shadow: 2px 2px 3px rgba(100,100,100,0.9);
+}
+
 #video-container {
   height:800px;
   width:1200px;
   background-color: #000;
+}
+
+#left {
+  width: 50%;
+  float: left;
+  position: relative;
+  top: 43%;
+  left: 2%;
+}
+
+#right {
+  width: 50%;
+  float: right;
+  position: relative;
+  top: 43%;
+  right: 2%;
+}
+
+#glcanvas {
+  position:absolute;
+  top:0; bottom:0; right:0; left:0;
 }
 
 #video-controls {
@@ -71,20 +118,6 @@ body {
 	width: 500px;
 }
 
-a {
-  cursor: pointer;
-  color: rgba(0,0,0,.5);
-}
-
-a:hover {
-  color: rgba(0,0,0,.65);
-}
-
-a:active {
-  color: rgba(0,0,0,.8);
-  text-shadow: 2px 2px 3px rgba(100,100,100,0.9);
-}
-
 .icon {
   margin: 0px 5px;
   width:20px;
@@ -95,10 +128,15 @@ a:active {
   margin-top:5px;
 }
 
-select {
-  border: none;
-  background: rgba(0,0,0,.6);
-  color: rgba(255,255,255,.8);
-  padding: 2px;
-  border-radius: 3px;
+.title {
+  font-size: 54px;
+}
+
+.message {
+  font-size: 36px;
+}
+
+.title, .message {
+  text-align: center;
+  color: white;
 }
