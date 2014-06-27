@@ -9,7 +9,7 @@ Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, an
 
 eleVR Player was developed by [eleVR](http://eleVR.com). eleVR is a project of the Communications Design Group and is supported by SAP. The contributors to the project are [@hawksley](https://github.com/hawksley) and [@amluto](https://github.com/amluto).
 
-It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections. eleVR Player comes bundled with two relatively small *.webm files, one for each projection. You can download larger mp4 files from the [eleVR Downloads Page](http://elevr.com/downloads/), as well as from other spherical video sources.
+It currently supports spherical video with equirectangular projections and spherical 3D video with top/bottom equirectangular projections. eleVR Player Master does not come bundled with any video files, but you can get two small demo *.webm files from the gh-pages branch, one for each projection. Alternatively, you can use your own spherical video or can download larger mp4 files from the [eleVR Downloads Page](http://elevr.com/downloads/).
 
 ### Installing the vr.js plugin ###
 You will need to get the vr.js plugin in order to use the eleVR Web Player with your Oculus Rift. If you just want to use the keyboard interface, no installation is necessary.
