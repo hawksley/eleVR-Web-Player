@@ -84,10 +84,21 @@
 
   <body>
     <div id="video-container">
-      <canvas id="glcanvas" style="position:absolute; top:0; bottom:0; right:0; left:0;">
+      <!-- Loading Message -->
+      <div id="left">
+        <div class="title">Loading Video...</div>
+        <div class="message">Try WASD + Q/E</div>
+      </div>
+      <div id="right">
+        <div class="title">Loading Video...</div>
+        <div class="message">Try WASD + Q/E</div>
+      </div>
+
+      <canvas id="glcanvas">
         Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
       </canvas>
-      <video preload="auto" id="video" style="display:none;">
+      <video preload="auto" id="video">
+        <source src="therelaxatron.mp4" type='video/mp4'>
         <source src="therelaxatron.webm" type='video/webm'>
       </video>
       <!-- Video Controls -->
@@ -108,8 +119,8 @@
           </select>
 
           <select id="video-select" class="rfloat">
-            <option value="0therelaxatron.webm">The Relaxatron</option>
-            <option value="1Vidcon.webm">Vidcon</option>
+            <option value="0therelaxatron.webm">The Relaxatron (webm)</option>
+            <option value="1Vidcon.webm">Vidcon (webm)</option>
           </select>
 
           <a id="full-screen" class="fa fa-expand icon rfloat"></a>
