@@ -71,10 +71,6 @@ body {
 	width: 500px;
 }
 
-#volume-bar {
-	width: 60px;
-}
-
 a {
   cursor: pointer;
   color: rgba(0,0,0,.5);

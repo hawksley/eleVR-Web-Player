@@ -21,7 +21,6 @@
 
 var container, canvas, video, playButton, muteButton, fullScreenButton,
     seekBar, videoSelect, projectionSelect;
-    // volumeBar;
 
 var gl, reqAnimFrameID = 0;
 
@@ -107,7 +106,6 @@ function initElements() {
 
   // Sliders
   seekBar = document.getElementById("seek-bar");
-  // volumeBar = document.getElementById("volume-bar");
 
   // Selectors
   videoSelect = document.getElementById("video-select");
