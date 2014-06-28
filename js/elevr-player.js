@@ -60,8 +60,11 @@ function runEleVRPlayer() {
   initElements();
   createControls();
 
-  initWebGL(canvas);
+  initWebGL();
+
   if (gl) {
+    setCanvasSize();
+
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clearDepth(1.0);
     gl.disable(gl.DEPTH_TEST);
@@ -78,6 +81,8 @@ function runEleVRPlayer() {
         console.log('vr.js failed to initialize: ', error);
       vrloaded = true;
     });
+
+    setCanvasSize();
 
     enableKeyControls();
 
@@ -96,6 +101,8 @@ function runEleVRPlayer() {
  */
 function initElements() {
   container = document.getElementById("video-container");
+  container.style.width = window.innerWidth + "px";
+  container.style.height = window.innerHeight + "px";
   left = document.getElementById("left");
   right = document.getElementById("right");
   canvas = document.getElementById("glcanvas");
@@ -112,9 +119,14 @@ function initElements() {
   // Selectors
   videoSelect = document.getElementById("video-select");
   projectionSelect = document.getElementById("projection-select");
+
+  document.getElementById('title-l').style.fontSize = window.outerHeight / 20 + 'px';
+  document.getElementById('title-r').style.fontSize = window.outerHeight / 20 + 'px';
+  document.getElementById('message-l').style.fontSize = window.outerHeight / 30 + 'px';
+  document.getElementById('message-r').style.fontSize = window.outerHeight / 30 + 'px';
 }
 
-function initWebGL(canvas) {
+function initWebGL() {
   gl = null;
 
   try {
@@ -155,6 +167,19 @@ function initTextures() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.bindTexture(gl.TEXTURE_2D, null);
   textureTime = undefined;
+}
+
+function setCanvasSize() {
+    // vr.js really wants device pixel size to be 1:1
+    var screenWidth = window.innerWidth;
+    var screenHeight = window.innerHeight;
+    if (canvas.width != screenWidth || canvas.height != screenHeight) {
+      canvas.width = screenWidth;
+      canvas.height = screenHeight;
+
+      canvas.style.width = screenWidth + 'px';
+      canvas.style.height = screenHeight + 'px';
+    }
 }
 
 function updateTexture() {
@@ -374,8 +399,7 @@ function loadVideo(videoFile) {
   left.style.display = "block";
   right.style.display = "block";
 
-      // gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
   if (reqAnimFrameID) {
     cancelAnimationFrame(reqAnimFrameID);
