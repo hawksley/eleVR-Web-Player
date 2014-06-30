@@ -120,6 +120,7 @@ a:active {
 
 #seek-bar {
 	width: 35%;
+  float: left;
 }
 
 select {
@@ -131,6 +132,8 @@ select {
 .icon {
   margin: 0px 5px;
   width:20px;
+  float: left;
+  margin-top: 5px;
 }
 
 .rfloat {
