@@ -68,25 +68,11 @@ function runEleVRPlayer() {
   initWebGL();
 
   if (gl) {
-    setCanvasSize();
-
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clearDepth(1.0);
     gl.disable(gl.DEPTH_TEST);
 
-    stereoRenderer = new vr.StereoRenderer(gl, {
-      alpha: false,
-      depth: false,
-      stencil: false
-    });
-
-    vrstate = new vr.State();
-
-    vr.load(function(error) {
-      if (error)
-        console.log('vr.js failed to initialize: ', error);
-      vrloaded = true;
-    });
+    loadVRJS();
 
     setCanvasSize();
 
@@ -196,6 +182,22 @@ function initTextures() {
   textureTime = undefined;
 }
 
+function loadVRJS() {
+  stereoRenderer = new vr.StereoRenderer(gl, {
+    alpha: false,
+    depth: false,
+    stencil: false
+  });
+
+  vrstate = new vr.State();
+
+  vr.load(function(error) {
+    if (error)
+      console.log('vr.js failed to initialize: ', error);
+    vrloaded = true;
+  });
+}
+
 function setCanvasSize() {
     // vr.js really wants device pixel size to be 1:1
     var screenWidth = window.innerWidth;
@@ -206,6 +208,10 @@ function setCanvasSize() {
 
       canvas.style.width = screenWidth + 'px';
       canvas.style.height = screenHeight + 'px';
+
+      if (vrstate.hmd.present) {
+        loadVRJS();
+      }
     }
 }
 
@@ -348,6 +354,8 @@ function drawScene(frameTime) {
                 (textureLoaded - start) + 'ms to load texture + ' +
                 (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
   }
+
+  setCanvasSize();
 
   reqAnimFrameID = requestAnimationFrame(drawScene);
   prevFrameTime = frameTime;
