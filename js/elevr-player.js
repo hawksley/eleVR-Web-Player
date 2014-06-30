@@ -32,7 +32,7 @@ var positionsBuffer,
 
 var texture, textureTime;
 
-var mvMatrix, shaderProgram, vertexPositionAttribute, directionAttribute;
+var mvMatrix, shader;
 
 var stereoRenderer, vrstate, vrloaded = false;
 
@@ -103,7 +103,13 @@ function runEleVRPlayer() {
     // Keyboard Controls
     enableKeyControls();
 
-    initShaders();
+    shader = new ShaderProgram(gl, {
+      fragmentShaderName: 'shader-fs',
+      vertexShaderName: 'shader-vs',
+      attributes: ['aVertexPosition'],
+      uniforms: ['uSampler', 'eye', 'projection', 'proj_inv'],
+    });
+
     initBuffers();
     initTextures();
 
@@ -218,18 +224,18 @@ function updateTexture() {
  * Drawing the scene
  */
 function drawOneEye(eye) {
-  gl.useProgram(shaderProgram);
+  gl.useProgram(shader.program);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, positionsBuffer);
-  gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(shader.attributes['aVertexPosition'], 2, gl.FLOAT, false, 0, 0);
 
   // Specify the texture to map onto the faces.
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+  gl.uniform1i(shader.uniforms['uSampler'], 0);
 
-  gl.uniform1f(gl.getUniformLocation(shaderProgram, "eye"), eye.viewport[0]*2);
-  gl.uniform1f(gl.getUniformLocation(shaderProgram, "projection"), projection);
+  gl.uniform1f(shader.uniforms['eye'], eye.viewport[0]*2);
+  gl.uniform1f(shader.uniforms['projection'], projection);
 
   var rotation = mat4.create();
 
@@ -245,14 +251,12 @@ function drawOneEye(eye) {
     mat4.fromQuat(rotation, manualRotation);
   }
 
-  var projectionInvLocation = gl.getUniformLocation(shaderProgram, "proj_inv");
-
   var projectionInverse = mat4.create();
   mat4.invert(projectionInverse, eye.projectionMatrix)
   var inv = mat4.create();
   mat4.multiply(inv, rotation, projectionInverse);
 
-  gl.uniformMatrix4fv(projectionInvLocation, false, inv);
+  gl.uniformMatrix4fv(shader.uniforms['proj_inv'], false, inv);
 
   // Draw
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, verticesIndexBuffer);
@@ -331,23 +335,35 @@ function drawScene(frameTime) {
 /**
  * Shader Related Functions
  */
-function initShaders() {
-  var fragmentShader = getShader(gl, "shader-fs");
-  var vertexShader = getShader(gl, "shader-vs");
+function ShaderProgram(gl, params) {
+  this.params = params;
+  this.fragmentShader = getShader(gl, this.params.fragmentShaderName);
+  this.vertexShader = getShader(gl, this.params.vertexShaderName);
 
-  shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertexShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
+  this.program = gl.createProgram();
+  gl.attachShader(this.program, this.vertexShader);
+  gl.attachShader(this.program, this.fragmentShader);
+  gl.linkProgram(this.program);
 
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
+  if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+    alert("Unable to initialize the shader program: " + gl.getProgramInfoLog(this.program));
   }
 
-  gl.useProgram(shaderProgram);
+  gl.useProgram(this.program);
 
-  vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-  gl.enableVertexAttribArray(vertexPositionAttribute);
+  this.attributes = {}
+  for (var i = 0; i < this.params.attributes.length; i++) {
+    var name = this.params.attributes[i];
+    this.attributes[name] = gl.getAttribLocation(this.program, name);
+    gl.enableVertexAttribArray(this.attributes[name]);
+  }
+
+  this.uniforms = {}
+  for (var i = 0; i < this.params.uniforms.length; i++) {
+    var name = this.params.uniforms[i];
+    this.uniforms[name] = gl.getUniformLocation(this.program, name);
+    gl.enableVertexAttribArray(this.attributes[name]);
+  }
 }
 
 function getShader(gl, id) {
