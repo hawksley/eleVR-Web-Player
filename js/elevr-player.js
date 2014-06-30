@@ -223,7 +223,7 @@ function updateTexture() {
 /**
  * Drawing the scene
  */
-function drawOneEye(eye) {
+function drawOneEye(eye, projectionMatrix) {
   gl.useProgram(shader.program);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, positionsBuffer);
@@ -234,7 +234,7 @@ function drawOneEye(eye) {
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(shader.uniforms['uSampler'], 0);
 
-  gl.uniform1f(shader.uniforms['eye'], eye.viewport[0]*2);
+  gl.uniform1f(shader.uniforms['eye'], eye);
   gl.uniform1f(shader.uniforms['projection'], projection);
 
   var rotation = mat4.create();
@@ -252,11 +252,19 @@ function drawOneEye(eye) {
   }
 
   var projectionInverse = mat4.create();
-  mat4.invert(projectionInverse, eye.projectionMatrix)
+  mat4.invert(projectionInverse, projectionMatrix)
   var inv = mat4.create();
   mat4.multiply(inv, rotation, projectionInverse);
 
   gl.uniformMatrix4fv(shader.uniforms['proj_inv'], false, inv);
+
+  if (!vrstate.hmd.present) {
+    if (eye == 0) { // left eye
+      gl.viewport(0, 0, canvas.width/2, canvas.height);
+    } else { // right eye
+      gl.viewport(canvas.width/2, 0, canvas.width/2, canvas.height);
+    }
+  }
 
   // Draw
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, verticesIndexBuffer);
@@ -314,9 +322,12 @@ function drawScene(frameTime) {
   }
 
   if (vrstate.hmd.present) {
-    stereoRenderer.render(vrstate, drawOneEye, this);
+    stereoRenderer.render(vrstate, function(eye) {drawOneEye(eye.viewport[0]*2, eye.projectionMatrix);}, this);
   } else {
-    stereoRenderer.render(vrstate, drawOneEye, this);
+    var perspectiveMatrix = mat4.create();
+    mat4.perspective(perspectiveMatrix, Math.PI/2, 1, .1, 10);
+    drawOneEye(0, perspectiveMatrix);
+    drawOneEye(1, perspectiveMatrix);
   }
 
   if (showTiming) {
