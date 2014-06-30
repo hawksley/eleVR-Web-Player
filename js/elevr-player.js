@@ -438,9 +438,10 @@ function getShader(gl, id) {
 function loaded() {
   leftLoad.style.display = "none";
   rightLoad.style.display = "none";
-
-  leftPlay.style.display = "block";
-  rightPlay.style.display = "block";
+  if (video.paused) {
+    leftPlay.style.display = "block";
+    rightPlay.style.display = "block";
+  }
 }
 
 function play(event) {
