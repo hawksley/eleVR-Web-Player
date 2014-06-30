@@ -20,9 +20,11 @@
 "use strict";
 
 var container, canvas, video, playButton, muteButton, fullScreenButton,
-    seekBar, videoSelect, projectionSelect, left, right;
+    seekBar, videoSelect, projectionSelect,
+    leftLoad, rightLoad, leftPlay, rightPlay, playL, playR;
 
 var gl, reqAnimFrameID = 0;
+var currentScreenOrientation = window.orientation || 0; // active default
 
 var positionsBuffer,
     verticesIndexBuffer,
@@ -44,16 +46,19 @@ var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
       'q' : {index: 2, sign: -1, active: 0},
       'e' : {index: 2, sign: 1, active: 0},
     },
+    deviceAlpha, deviceBeta, deviceGamma,
+    deviceRotation = quat.create(),
+    degtorad = Math.PI / 180, // Degree-to-Radian conversion
 
     prevFrameTime = null,
     showTiming = false;  // Switch to true to show frame times in the console
 
 var ProjectionEnum = Object.freeze({
                   EQUIRECT: 0,
-                  EQUIRECT_3D: 1});
-var projection = 0;
+                  EQUIRECT_3D: 1}),
+    projection = 0,
 
-var videoObjectURL = null;
+  videoObjectURL = null;
 
 function runEleVRPlayer() {
 
@@ -74,6 +79,7 @@ function runEleVRPlayer() {
       depth: false,
       stencil: false
     });
+
     vrstate = new vr.State();
 
     vr.load(function(error) {
@@ -84,15 +90,26 @@ function runEleVRPlayer() {
 
     setCanvasSize();
 
+    // Android Controls: Listen for orientation.
+    var degtorad = Math.PI / 180; // Degree-to-Radian conversion
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', function(orientation) {
+        deviceAlpha = orientation.alpha;
+        deviceGamma = orientation.gamma;
+        deviceBeta = orientation.beta;
+      }.bind(this));
+    }
+
+    // Keyboard Controls
     enableKeyControls();
 
     initShaders();
     initBuffers();
     initTextures();
 
-    video.addEventListener("canplaythrough", play, true);
-    video.addEventListener("ended", ended, true);
-    video.preload = "auto";
+    video.addEventListener("canplaythrough", loaded);
+    video.addEventListener("ended", ended);
+    // video.preload = "auto";
   }
 }
 
@@ -103,13 +120,17 @@ function initElements() {
   container = document.getElementById("video-container");
   container.style.width = window.innerWidth + "px";
   container.style.height = window.innerHeight + "px";
-  left = document.getElementById("left");
-  right = document.getElementById("right");
+  leftLoad = document.getElementById("left-load");
+  rightLoad = document.getElementById("right-load");
+  leftPlay = document.getElementById("left-play");
+  rightPlay = document.getElementById("right-play");
   canvas = document.getElementById("glcanvas");
   video = document.getElementById("video");
 
   // Buttons
   playButton = document.getElementById("play-pause");
+  playL = document.getElementById("play-l");
+  playR = document.getElementById("play-r");
   muteButton = document.getElementById("mute");
   fullScreenButton = document.getElementById("full-screen");
 
@@ -211,9 +232,14 @@ function drawOneEye(eye) {
   gl.uniform1f(gl.getUniformLocation(shaderProgram, "projection"), projection);
 
   var rotation = mat4.create();
+
   if (vrstate.hmd.present) {
     var totalRotation = quat.create();
     quat.multiply(totalRotation, manualRotation, vrstate.hmd.rotation);
+    mat4.fromQuat(rotation, totalRotation);
+  } else if (deviceAlpha && deviceBeta && deviceGamma) {
+    var totalRotation = quat.create();
+    quat.multiply(totalRotation, manualRotation, deviceRotation);
     mat4.fromQuat(rotation, totalRotation);
   } else {
     mat4.fromQuat(rotation, manualRotation);
@@ -254,9 +280,40 @@ function drawScene(frameTime) {
                                  manualRotateRate[2] * interval, 1.0);
     quat.normalize(update, update);
     quat.multiply(manualRotation, manualRotation, update);
+
+    if (deviceAlpha && deviceBeta && deviceGamma) {
+      // Apply device orientation
+      var z = deviceAlpha * degtorad / 2;
+      var x = deviceBeta * degtorad / 2;
+      var y = deviceGamma * degtorad / 2;
+      var cX = Math.cos(x);
+      var cY = Math.cos(y);
+      var cZ = Math.cos(z);
+      var sX = Math.sin(x);
+      var sY = Math.sin(y);
+      var sZ = Math.sin(z);
+
+      // ZXY quaternion construction.
+      var w = cX * cY * cZ - sX * sY * sZ;
+      var x = sX * cY * cZ - cX * sY * sZ;
+      var y = cX * sY * cZ + sX * cY * sZ;
+      var z = cX * cY * sZ + sX * sY * cZ;
+
+      var deviceQuaternion = quat.fromValues(x, y, z, w);
+
+      // Correct for the screen orientation.
+      var screenOrientation = (util.getScreenOrientation() * degtorad)/2;
+      var screenTransform = [0, 0, -Math.sin(screenOrientation), Math.cos(screenOrientation)];
+
+      quat.multiply(deviceRotation, deviceQuaternion, screenTransform);
+    }
   }
 
-  stereoRenderer.render(vrstate, drawOneEye, this);
+  if (vrstate.hmd.present) {
+    stereoRenderer.render(vrstate, drawOneEye, this);
+  } else {
+    
+  }
 
   if (showTiming) {
     gl.finish();
@@ -335,22 +392,34 @@ function getShader(gl, id) {
 /**
  * Video Commands
  */
-function play() {
+function loaded() {
+  leftLoad.style.display = "none";
+  rightLoad.style.display = "none";
+
+  leftPlay.style.display = "block";
+  rightPlay.style.display = "block";
+}
+
+function play(event) {
   if (video.ended) {
     video.currentTime = 0.1;
   }
-  left.style.display = "none";
-  right.style.display = "none";
 
   video.play();
-  playButton.className = "fa fa-pause icon"
+  if (!video.paused) { // In case somehow hitting play button doesnt work
+    leftPlay.style.display = "none";
+    rightPlay.style.display = "none";
 
-  reqAnimFrameID = requestAnimationFrame(drawScene);
+    playButton.className = "fa fa-pause icon";
+    reqAnimFrameID = requestAnimationFrame(drawScene);
+  }
 }
 
 function pause() {
   video.pause();
   playButton.className = "fa fa-play icon";
+  leftPlay.style.display = "block";
+  rightPlay.style.display = "block";
 }
 
 function ended() {
@@ -396,8 +465,10 @@ function selectLocalVideo() {
 
 function loadVideo(videoFile) {
   pause();
-  left.style.display = "block";
-  right.style.display = "block";
+  leftPlay.style.display = "none";
+  rightPlay.style.display = "none";
+  leftLoad.style.display = "block";
+  rightLoad.style.display = "block";
 
   gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -418,8 +489,9 @@ function loadVideo(videoFile) {
 
   video.src = videoFile;
 
-  if (videoObjectURL && videoObjectURL != videoFile)
+  if (videoObjectURL && videoObjectURL != videoFile) {
     URL.removeObjectURL(oldObjURL);
+  }
 }
 
 function fullscreen() {
@@ -437,6 +509,22 @@ function fullscreen() {
  */
 function createControls() {
   playButton.addEventListener("click", function() {
+    if (video.paused == true) {
+      play();
+    } else {
+      pause();
+    }
+  });
+
+  playL.addEventListener("click", function() {
+    if (video.paused == true) {
+      play();
+    } else {
+      pause();
+    }
+  });
+
+  playR.addEventListener("click", function() {
     if (video.paused == true) {
       play();
     } else {

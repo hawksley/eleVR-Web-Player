@@ -21,8 +21,10 @@ body {
   background-color: #000;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
+  color: #FFF;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 select {
@@ -43,32 +45,34 @@ a {
 }
 
 a:hover {
-  color: rgba(0,0,0,.65);
+  color: rgba(255,255,255,.65);
 }
 
 a:active {
-  color: rgba(0,0,0,.8);
-  text-shadow: 2px 2px 3px rgba(100,100,100,0.9);
+  color: rgba(255,255,255,.8);
+  text-shadow: 2px 2px 3px rgba(200,200,200,.9);
 }
 
 #video-container {
   background-color: #000;
 }
 
-#left {
+.left {
   width: 50%;
   float: left;
   position: relative;
   top: 43%;
   left: 2%;
+  z-index: 1;
 }
 
-#right {
+.right {
   width: 50%;
   float: right;
   position: relative;
   top: 43%;
   right: 2%;
+  z-index: 1;
 }
 
 #glcanvas {
@@ -128,7 +132,9 @@ a:active {
   margin-top:5px;
 }
 
-.title, .message {
+.title, .message, .large-play {
   text-align: center;
-  color: white;
+  margin: 0 auto;
+  display: block;
+  color: rgba(255,255,255,.5);
 }
