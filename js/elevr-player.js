@@ -312,7 +312,7 @@ function drawScene(frameTime) {
   if (vrstate.hmd.present) {
     stereoRenderer.render(vrstate, drawOneEye, this);
   } else {
-    
+    stereoRenderer.render(vrstate, drawOneEye, this);
   }
 
   if (showTiming) {
