@@ -318,6 +318,16 @@ function drawScene(frameTime) {
       var screenTransform = [0, 0, -Math.sin(screenOrientation), Math.cos(screenOrientation)];
 
       quat.multiply(deviceRotation, deviceQuaternion, screenTransform);
+
+      // deviceRotation is the quaternion encoding of the transformation
+      // from camera coordinates to world coordinates.  The problem is that
+      // our shader uses conventional OpenGL coordinates
+      // (+x = right, +y = up, +z = backward), but the DeviceOrientation
+      // spec uses different coordinates (+x = East, +y = North, +z = up).
+      // To fix the mismatch, we need to fix this.  We'll arbitrarily choose
+      // North to correspond to -z (the default camera direction).
+      var r22 = Math.sqrt(0.5);
+      quat.multiply(deviceRotation, quat.fromValues(-r22, 0, 0, r22), deviceRotation);
     }
   }
 
