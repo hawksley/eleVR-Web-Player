@@ -119,7 +119,13 @@ a:active {
 }
 
 #seek-bar {
-	width: 500px;
+	width: 35%;
+}
+
+select {
+  width: 12%;
+  max-width: 300px;
+  margin-right: 5px;
 }
 
 .icon {

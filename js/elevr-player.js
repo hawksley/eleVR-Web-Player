@@ -515,7 +515,7 @@ function loadVideo(videoFile) {
   }
 
   // Hack to fix rotation for vidcon video for vidcon
-  if (videoFile == "Vidcon.webm") {
+  if (videoFile == "Vidcon.webm" || videoFile == "Vidcon_2.mp4") {
     manualRotation = [0.38175851106643677, -0.7102527618408203, -0.2401944249868393, 0.5404701232910156];
   } else {
     manualRotation = quat.create();
