@@ -339,7 +339,8 @@ function drawScene(frameTime) {
     stereoRenderer.render(vrstate, function(eye) {drawOneEye(eye.viewport[0]*2, eye.projectionMatrix);}, this);
   } else {
     var perspectiveMatrix = mat4.create();
-    mat4.perspective(perspectiveMatrix, Math.PI/2, 1, .1, 10);
+    var ratio = (canvas.width/2)/canvas.height;
+    mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
     drawOneEye(0, perspectiveMatrix);
     drawOneEye(1, perspectiveMatrix);
   }
