@@ -183,19 +183,26 @@ function initTextures() {
 }
 
 function loadVRJS() {
-  stereoRenderer = new vr.StereoRenderer(gl, {
-    alpha: false,
-    depth: false,
-    stencil: false
-  });
-
   vrstate = new vr.State();
 
-  vr.load(function(error) {
-    if (error)
-      console.log('vr.js failed to initialize: ', error);
-    vrloaded = true;
-  });
+  if (vrstate.hmd.present) {
+    stereoRenderer = new vr.StereoRenderer(gl, {
+      alpha: false,
+      depth: false,
+      stencil: false
+    });
+
+    vr.load(function(error) {
+      if (error) {
+        console.log('vr.js failed to initialize: ', error);
+      }
+      vrloaded = true;
+    });
+  } else {
+    vrloaded = true; // nothing to load
+  }
+
+
 }
 
 function setCanvasSize() {
@@ -280,11 +287,13 @@ function drawScene(frameTime) {
     var start = performance.now();
 
   updateTexture();
-  if (!vrloaded)
+  if (!vrloaded) {
     return;
+  }
 
-  if (showTiming)
+  if (showTiming){
     var textureLoaded = performance.now();
+  }
 
   vr.pollState(vrstate);
   if (prevFrameTime) {
@@ -499,8 +508,7 @@ function selectLocalVideo() {
     }
 
     videoObjectURL = URL.createObjectURL(files[0]);
-    console.log('Loading local file ', files[0].name,
-		' at URL ', videoObjectURL);
+    console.log('Loading local file ', files[0].name, ' at URL ', videoObjectURL);
     videoSelect.value = "";
     loadVideo(videoObjectURL);
   });
