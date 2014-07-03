@@ -51,6 +51,10 @@ The vr.js plugin seems to occasionally get confused about the resolution of the 
 ## Future Work ##
 The following is a short subset of planned future work on the player.
 - Add additional projections
+- Add compatibility to the Native Browser VR support currently being implemented by Firefox and Chrome: 
+  - http://blog.tojicode.com/2014/07/bringing-vr-to-chrome.html 
+  - http://blog.bitops.com/blog/2014/06/26/first-steps-for-vr-on-the-web/
+  - This compatibility will probably be kept to a branch until the browser versions with VR support are publicly used
 - Clean up code to make it easier to drop in places
 - Pull webGL shaders out of the html file
 
