@@ -185,24 +185,18 @@ function initTextures() {
 function loadVRJS() {
   vrstate = new vr.State();
 
-  if (vrstate.hmd.present) {
-    stereoRenderer = new vr.StereoRenderer(gl, {
-      alpha: false,
-      depth: false,
-      stencil: false
-    });
+  stereoRenderer = new vr.StereoRenderer(gl, {
+    alpha: false,
+    depth: false,
+    stencil: false
+  });
 
-    vr.load(function(error) {
-      if (error) {
-        console.log('vr.js failed to initialize: ', error);
-      }
-      vrloaded = true;
-    });
-  } else {
-    vrloaded = true; // nothing to load
-  }
-
-
+  vr.load(function(error) {
+    if (error) {
+      console.log('vr.js failed to initialize: ', error);
+    }
+    vrloaded = true;
+  });
 }
 
 function setCanvasSize() {
