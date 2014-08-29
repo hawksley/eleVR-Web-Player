@@ -182,23 +182,6 @@ function initTextures() {
   textureTime = undefined;
 }
 
-function loadVRJS() {
-  vrstate = new vr.State();
-
-  stereoRenderer = new vr.StereoRenderer(gl, {
-    alpha: false,
-    depth: false,
-    stencil: false
-  });
-
-  vr.load(function(error) {
-    if (error) {
-      console.log('vr.js failed to initialize: ', error);
-    }
-    vrloaded = true;
-  });
-}
-
 function setCanvasSize() {
     // vr.js really wants device pixel size to be 1:1
     var screenWidth = window.innerWidth;
@@ -209,10 +192,6 @@ function setCanvasSize() {
 
       canvas.style.width = screenWidth + 'px';
       canvas.style.height = screenHeight + 'px';
-
-      if (vrstate.hmd.present) {
-        loadVRJS();
-      }
     }
 }
 
@@ -289,7 +268,6 @@ function drawScene(frameTime) {
     var textureLoaded = performance.now();
   }
 
-  vr.pollState(vrstate);
   if (prevFrameTime) {
     // Apply manual controls.
     var interval = (frameTime - prevFrameTime) * 0.001;
