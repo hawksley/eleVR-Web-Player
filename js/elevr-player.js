@@ -34,8 +34,6 @@ var texture, textureTime;
 
 var mvMatrix, shader;
 
-var stereoRenderer, vrstate, vrloaded = false;
-
 var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
     manualRotation = quat.create(),
     manualControls = {
@@ -71,8 +69,6 @@ function runEleVRPlayer() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clearDepth(1.0);
     gl.disable(gl.DEPTH_TEST);
-
-    loadVRJS();
 
     setCanvasSize();
 
@@ -223,11 +219,7 @@ function drawOneEye(eye, projectionMatrix) {
 
   var rotation = mat4.create();
 
-  if (vrstate.hmd.present) {
-    var totalRotation = quat.create();
-    quat.multiply(totalRotation, manualRotation, vrstate.hmd.rotation);
-    mat4.fromQuat(rotation, totalRotation);
-  } else if (deviceAlpha && deviceBeta && deviceGamma) {
+  if (deviceAlpha && deviceBeta && deviceGamma) {
     var totalRotation = quat.create();
     quat.multiply(totalRotation, manualRotation, deviceRotation);
     mat4.fromQuat(rotation, totalRotation);
@@ -242,12 +234,10 @@ function drawOneEye(eye, projectionMatrix) {
 
   gl.uniformMatrix4fv(shader.uniforms['proj_inv'], false, inv);
 
-  if (!vrstate.hmd.present) {
-    if (eye == 0) { // left eye
-      gl.viewport(0, 0, canvas.width/2, canvas.height);
-    } else { // right eye
-      gl.viewport(canvas.width/2, 0, canvas.width/2, canvas.height);
-    }
+  if (eye == 0) { // left eye
+    gl.viewport(0, 0, canvas.width/2, canvas.height);
+  } else { // right eye
+    gl.viewport(canvas.width/2, 0, canvas.width/2, canvas.height);
   }
 
   // Draw
@@ -260,9 +250,6 @@ function drawScene(frameTime) {
     var start = performance.now();
 
   updateTexture();
-  if (!vrloaded) {
-    return;
-  }
 
   if (showTiming){
     var textureLoaded = performance.now();
@@ -316,15 +303,15 @@ function drawScene(frameTime) {
     }
   }
 
-  if (vrstate.hmd.present) {
-    stereoRenderer.render(vrstate, function(eye) {drawOneEye(eye.viewport[0]*2, eye.projectionMatrix);}, this);
-  } else {
+  // if (vrstate.hmd.present) {
+  //   stereoRenderer.render(vrstate, function(eye) {drawOneEye(eye.viewport[0]*2, eye.projectionMatrix);}, this);
+  // } else {
     var perspectiveMatrix = mat4.create();
     var ratio = (canvas.width/2)/canvas.height;
     mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
     drawOneEye(0, perspectiveMatrix);
     drawOneEye(1, perspectiveMatrix);
-  }
+  // }
 
   if (showTiming) {
     gl.finish();
