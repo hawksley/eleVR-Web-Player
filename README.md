@@ -3,7 +3,7 @@ eleVR Web Player
 
 The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift or Android device with VR headset (Cardboard, Durovis Dive, etc.) from a web browser. It is written with js, html5, and webGL. It depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section. 
 
-Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift if the vr.js plugin is installed.
+Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift if the vr.js plugin is installed. It does not work with DK2. *The next planned work is to get it working with the native browser support currently being implemented by Firefox and Chrome.*
 
 #### [Go check out the demo!](http://hawksley.github.io/eleVR-Web-Player/) ####
 
