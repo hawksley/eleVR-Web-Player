@@ -34,6 +34,8 @@ var texture, textureTime;
 
 var mvMatrix, shader;
 
+var vrHMD, vrSensor;
+
 var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
     manualRotation = quat.create(),
     manualControls = {
@@ -59,6 +61,7 @@ var ProjectionEnum = Object.freeze({
   videoObjectURL = null;
 
 function runEleVRPlayer() {
+  initWebVR();
 
   initElements();
   createControls();
@@ -104,6 +107,12 @@ function runEleVRPlayer() {
 /**
  * Lots of Init Methods
  */
+function initWebVR() {
+  if (navigator.getVRDevices) {
+    navigator.getVRDevices().then(vrDeviceCallback);
+  }
+}
+
 function initElements() {
   container = document.getElementById("video-container");
   container.style.width = window.innerWidth + "px";
@@ -200,6 +209,32 @@ function updateTexture() {
     textureTime = video.currentTime;
 }
 
+function vrDeviceCallback(vrdevs) {
+  for (var i = 0; i < vrdevs.length; ++i) {
+    if (vrdevs[i] instanceof HMDVRDevice) {
+      vrHMD = vrdevs[i];
+      break;
+    }
+  }
+
+  if (!vrHMD)
+    return;
+
+  // Then, find that HMD's position sensor
+  for (var i = 0; i < vrdevs.length; ++i) {
+    if (vrdevs[i] instanceof PositionSensorVRDevice &&
+        vrdevs[i].hardwareUnitId == vrHMD.hardwareUnitId)
+    {
+      vrSensor = vrdevs[i];
+      break;
+    }
+  }
+
+  if (!vrSensor) {
+    alert("Found a HMD, but didn't find its orientation sensor?");
+  }
+}
+
 /**
  * Drawing the scene
  */
@@ -219,7 +254,13 @@ function drawOneEye(eye, projectionMatrix) {
 
   var rotation = mat4.create();
 
-  if (deviceAlpha && deviceBeta && deviceGamma) {
+  if(vrSensor.getState()) {
+    var state = vrSensor.getState();
+    var totalRotation = quat.create();
+    var sensorOrientation = [state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w];
+    quat.multiply(totalRotation, manualRotation, sensorOrientation);
+    mat4.fromQuat(rotation, totalRotation);
+  }else if (deviceAlpha && deviceBeta && deviceGamma) {
     var totalRotation = quat.create();
     quat.multiply(totalRotation, manualRotation, deviceRotation);
     mat4.fromQuat(rotation, totalRotation);
@@ -303,15 +344,11 @@ function drawScene(frameTime) {
     }
   }
 
-  // if (vrstate.hmd.present) {
-  //   stereoRenderer.render(vrstate, function(eye) {drawOneEye(eye.viewport[0]*2, eye.projectionMatrix);}, this);
-  // } else {
-    var perspectiveMatrix = mat4.create();
-    var ratio = (canvas.width/2)/canvas.height;
-    mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
-    drawOneEye(0, perspectiveMatrix);
-    drawOneEye(1, perspectiveMatrix);
-  // }
+  var perspectiveMatrix = mat4.create();
+  var ratio = (canvas.width/2)/canvas.height;
+  mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
+  drawOneEye(0, perspectiveMatrix);
+  drawOneEye(1, perspectiveMatrix);
 
   if (showTiming) {
     gl.finish();
@@ -507,12 +544,12 @@ function loadVideo(videoFile) {
 }
 
 function fullscreen() {
-  if (video.requestFullscreen) {
-    container.requestFullscreen();
-  } else if (video.mozRequestFullScreen) {
-    container.mozRequestFullScreen(); // Firefox
-  } else if (video.webkitRequestFullscreen) {
-    container.webkitRequestFullscreen(); // Chrome and Safari
+  if (canvas.mozRequestFullScreen) {
+    canvas.mozRequestFullScreen({ vrDisplay: vrHMD }); // Firefox
+  } else if (canvas.webkitRequestFullscreen) {
+    canvas.webkitRequestFullscreen({ vrDisplay: vrHMD }); // Chrome and Safari
+  } else if (canvas.requestFullScreen){
+    canvas.requestFullscreen();
   }
 }
 
@@ -607,6 +644,18 @@ function createControls() {
 /**
  * Keyboard Controls
  */
+ function onkey(event) {
+   switch (String.fromCharCode(event.charCode)) {
+   case 'f':
+     fullscreen();
+     break;
+   case 'z':
+     vrSensor.zeroSensor();
+     break;
+   }
+ }
+ window.addEventListener("keypress", onkey, true);
+
 function enableKeyControls() {
   function key(event, sign) {
     var control = manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
