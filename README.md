@@ -5,7 +5,7 @@ The eleVR player lets you watch 360 flat and stereo video on your Oculus Rift or
 
 Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift if the vr.js plugin is installed. This does not work on DK2.
 
-The native-support branch contains the current progress towards getting eleVR Web Player working with the native browser support currently being implemented by [Firefox](http://blog.bitops.com/blog/2014/06/26/first-steps-for-vr-on-the-web/) and [Chromium](https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list). This branch is currently functional (although still under development) with the latest WebVR builds for both browsers and *does* support the DK2. Feel free to download the browsers, branch the project, and try them out. There is no currently set up web demo. Press 'f' for full screen.
+The native-support branch contains the current progress towards getting eleVR Web Player working with the native browser support currently being implemented by [Firefox](http://blog.bitops.com/blog/2014/06/26/first-steps-for-vr-on-the-web/) and [Chromium](https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list). This branch is currently functional (although still under development) with the latest WebVR builds for both browsers and *does* support the DK2. Feel free to download the browsers, branch the project, and try them out. Please note that the browsers may not have mp4 support. There is no currently set up web demo. Press 'f' for full screen.
 
 #### [Go check out the demo!](http://hawksley.github.io/eleVR-Web-Player/) ####
 
