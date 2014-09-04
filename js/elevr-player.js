@@ -257,8 +257,12 @@ function drawOneEye(eye, projectionMatrix) {
   if(typeof vrSensor !== 'undefined') {
     var state = vrSensor.getState();
     var totalRotation = quat.create();
-    var sensorOrientation = [state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w];
-    quat.multiply(totalRotation, manualRotation, sensorOrientation);
+    if (typeof vrSensor.orientation !== 'undefined') {
+      var sensorOrientation = new Float32Array([state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w]);
+      quat.multiply(totalRotation, manualRotation, sensorOrientation);
+    } else {
+      totalRotation = manualRotation;
+    }
     mat4.fromQuat(rotation, totalRotation);
   }else if (deviceAlpha && deviceBeta && deviceGamma) {
     var totalRotation = quat.create();
@@ -472,6 +476,14 @@ function pause() {
   rightPlay.style.display = "block";
 }
 
+function playPause() {
+  if (video.paused == true) {
+    play();
+  } else {
+    pause();
+  }
+}
+
 function ended() {
   pause();
   if (reqAnimFrameID) {
@@ -553,32 +565,30 @@ function fullscreen() {
   }
 }
 
+function fullscreenIgnoreHMD() {
+  if (canvas.mozRequestFullScreen) {
+    canvas.mozRequestFullScreen(); // Firefox
+  } else if (canvas.webkitRequestFullscreen) {
+    canvas.webkitRequestFullscreen(); // Chrome and Safari
+  } else if (canvas.requestFullScreen){
+    canvas.requestFullscreen();
+  }
+}
+
 /**
  * Video Controls
  */
 function createControls() {
   playButton.addEventListener("click", function() {
-    if (video.paused == true) {
-      play();
-    } else {
-      pause();
-    }
+    playPause();
   });
 
   playL.addEventListener("click", function() {
-    if (video.paused == true) {
-      play();
-    } else {
-      pause();
-    }
+    playPause();
   });
 
   playR.addEventListener("click", function() {
-    if (video.paused == true) {
-      play();
-    } else {
-      pause();
-    }
+    playPause();
   });
 
   muteButton.addEventListener("click", function() {
@@ -644,18 +654,6 @@ function createControls() {
 /**
  * Keyboard Controls
  */
- function onkey(event) {
-   switch (String.fromCharCode(event.charCode)) {
-   case 'f':
-     fullscreen();
-     break;
-   case 'z':
-     vrSensor.zeroSensor();
-     break;
-   }
- }
- window.addEventListener("keypress", onkey, true);
-
 function enableKeyControls() {
   function key(event, sign) {
     var control = manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
@@ -667,8 +665,26 @@ function enableKeyControls() {
     manualRotateRate[control.index] += sign * control.sign;
   }
 
+  function onkey(event) {
+    switch (String.fromCharCode(event.charCode)) {
+    case 'f':
+      fullscreen();
+      break;
+    case 'z':
+      vrSensor.zeroSensor();
+      break;
+    case 'p':
+      playPause();
+      break;
+    case 'g':
+      fullscreenIgnoreHMD();
+      break;
+    }
+  }
+
   document.addEventListener('keydown', function(event) { key(event, 1); },
           false);
   document.addEventListener('keyup', function(event) { key(event, -1); },
           false);
+  window.addEventListener("keypress", onkey, true);
 }
