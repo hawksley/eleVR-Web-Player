@@ -257,7 +257,7 @@ function drawOneEye(eye, projectionMatrix) {
   if(typeof vrSensor !== 'undefined') {
     var state = vrSensor.getState();
     var totalRotation = quat.create();
-    if (typeof vrSensor.orientation !== 'undefined') {
+    if (typeof state.orientation !== 'undefined') {
       var sensorOrientation = new Float32Array([state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w]);
       quat.multiply(totalRotation, manualRotation, sensorOrientation);
     } else {
