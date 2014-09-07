@@ -188,6 +188,16 @@ function initTextures() {
 }
 
 function setCanvasSize() {
+    var screenWidth = window.innerWidth;
+    var screenHeight = window.innerHeight;
+    if (canvas.width != screenWidth || canvas.height != screenHeight) {
+      canvas.width = screenWidth;
+      canvas.height = screenHeight;
+
+      canvas.style.width = screenWidth + 'px';
+      canvas.style.height = screenHeight + 'px';
+    }
+
     // query the various pixel ratios
     var devicePixelRatio = window.devicePixelRatio || 1;
     var backingStoreRatio = gl.webkitBackingStorePixelRatio ||
@@ -199,6 +209,7 @@ function setCanvasSize() {
 
     // upscale the canvas if the two ratios don't match
     if (devicePixelRatio !== backingStoreRatio) {
+
         var oldWidth = canvas.width;
         var oldHeight = canvas.height;
 
