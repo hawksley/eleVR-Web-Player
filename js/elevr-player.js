@@ -188,15 +188,25 @@ function initTextures() {
 }
 
 function setCanvasSize() {
-    // vr.js really wants device pixel size to be 1:1
-    var screenWidth = window.innerWidth;
-    var screenHeight = window.innerHeight;
-    if (canvas.width != screenWidth || canvas.height != screenHeight) {
-      canvas.width = screenWidth;
-      canvas.height = screenHeight;
+    // query the various pixel ratios
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var backingStoreRatio = gl.webkitBackingStorePixelRatio ||
+                            gl.mozBackingStorePixelRatio ||
+                            gl.msBackingStorePixelRatio ||
+                            gl.oBackingStorePixelRatio ||
+                            gl.backingStorePixelRatio || 1;
+    var ratio = devicePixelRatio / backingStoreRatio;
 
-      canvas.style.width = screenWidth + 'px';
-      canvas.style.height = screenHeight + 'px';
+    // upscale the canvas if the two ratios don't match
+    if (devicePixelRatio !== backingStoreRatio) {
+        var oldWidth = canvas.width;
+        var oldHeight = canvas.height;
+
+        canvas.width = oldWidth * ratio;
+        canvas.height = oldHeight * ratio;
+
+        canvas.style.width = oldWidth + 'px';
+        canvas.style.height = oldHeight + 'px';
     }
 }
 
