@@ -188,29 +188,29 @@ function initTextures() {
 }
 
 function setCanvasSize() {
-  var screenWidth;
-  var screenHeight;
+  var screenWidth, screenHeight;
+  screenWidth = window.innerWidth;
+  screenHeight = window.innerHeight;
 
   if (typeof vrHMD !== 'undefined' && typeof util.isFullscreen() !== 'undefined' && util.isFullscreen()) {
+    var canvasWidth, canvasHeight;
+
     if (typeof vrHMD.getRecommendedRenderTargetSize !== 'undefined') {
       var rect = vrHMD.getRecommendedRenderTargetSize();
-      screenWidth = rect.width;
-      screenHeight = rect.height;
+      canvasWidth = rect.width;
+      canvasHeight = rect.height;
     } else if (typeof vrHMD.getRecommendedEyeRenderRect !== 'undefined') {
       var rectHalf = vrHMD.getRecommendedEyeRenderRect('right');
-      screenWidth = rectHalf.width * 2;
-      screenHeight = rectHalf.height;
+      canvasWidth = rectHalf.width * 2;
+      canvasHeight = rectHalf.height;
     }
 
-    canvas.width = screenWidth;
-    canvas.height = screenHeight;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     canvas.style.width = screenWidth + 'px';
     canvas.style.height = screenHeight + 'px';
   } else {
-    screenWidth = window.innerWidth;
-    screenHeight = window.innerHeight;
-
     // query the various pixel ratios
     var devicePixelRatio = window.devicePixelRatio || 1;
     var backingStoreRatio = gl.webkitBackingStorePixelRatio ||
