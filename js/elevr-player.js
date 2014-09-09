@@ -19,7 +19,7 @@
 
 "use strict";
 
-var container, canvas, video, playButton, muteButton, fullScreenButton,
+var container, canvas, video, playButton, muteButton, loopButton, fullScreenButton,
     seekBar, videoSelect, projectionSelect,
     leftLoad, rightLoad, leftPlay, rightPlay, playL, playR;
 
@@ -129,6 +129,7 @@ function initElements() {
   playL = document.getElementById("play-l");
   playR = document.getElementById("play-r");
   muteButton = document.getElementById("mute");
+  loopButton = document.getElementById("loop");
   fullScreenButton = document.getElementById("full-screen");
 
   // Sliders
@@ -411,7 +412,6 @@ function drawScene(frameTime) {
                   (canvasResized - start) + 'ms canvas resized + ' +
                   (textureLoaded - canvasResized) + 'ms to load texture + ' +
                   (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
-      console.log(canvas.width + ' width ' + canvas.height + 'height');
       framesSinceIssue = 0;
     } else {
       framesSinceIssue++;
@@ -518,6 +518,7 @@ function play(event) {
     rightPlay.style.display = "none";
 
     playButton.className = "fa fa-pause icon";
+    playButton.title = "Pause";
     reqAnimFrameID = requestAnimationFrame(drawScene);
   }
 }
@@ -525,6 +526,7 @@ function play(event) {
 function pause() {
   video.pause();
   playButton.className = "fa fa-play icon";
+  playButton.title = "Play";
   leftPlay.style.display = "block";
   rightPlay.style.display = "block";
 }
@@ -534,6 +536,18 @@ function playPause() {
     play();
   } else {
     pause();
+  }
+}
+
+function toggleLooping() {
+  if (video.loop == true) {
+    loopButton.className = "fa fa-refresh icon";
+    loopButton.title="Loop Video";
+    video.loop = false;
+  } else {
+    loopButton.className = "fa fa-chain-broken icon";
+    loopButton.title="Stop Looping";
+    video.loop = true;
   }
 }
 
@@ -548,11 +562,13 @@ function ended() {
 function mute() {
   video.muted = true;
   muteButton.className = "fa fa-volume-off icon";
+  muteButton.title = "Unmute";
 }
 
 function unmute() {
   video.muted = false;
   muteButton.className = "fa fa-volume-up icon";
+  muteButton.title = "Mute";
 }
 
 function selectLocalVideo() {
@@ -644,6 +660,10 @@ function createControls() {
     playPause();
   });
 
+  loopButton.addEventListener("click", function() {
+    toggleLooping();
+  });
+
   muteButton.addEventListener("click", function() {
     if (video.muted == false) {
       mute();
@@ -731,6 +751,9 @@ function enableKeyControls() {
       break;
     case 'g':
       fullscreenIgnoreHMD();
+      break;
+    case 'l':
+      toggleLooping();
       break;
     }
   }
