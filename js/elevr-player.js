@@ -192,9 +192,15 @@ function setCanvasSize() {
   var screenHeight;
 
   if (typeof vrHMD !== 'undefined' && typeof util.isFullscreen() !== 'undefined' && util.isFullscreen()) {
-    var rectHalf = vrHMD.getRecommendedEyeRenderRect('right');
-    screenWidth = rectHalf.width * 2;
-    screenHeight = rectHalf.height;
+    if (typeof vrHMD.getRecommendedRenderTargetSize !== 'undefined') {
+      var rect = vrHMD.getRecommendedRenderTargetSize();
+      screenWidth = rect.width;
+      screenHeight = rect.height;
+    } else if (typeof vrHMD.getRecommendedEyeRenderRect !== 'undefined') {
+      var rectHalf = vrHMD.getRecommendedEyeRenderRect('right');
+      screenWidth = rectHalf.width * 2;
+      screenHeight = rectHalf.height;
+    }
 
     canvas.width = screenWidth;
     canvas.height = screenHeight;
