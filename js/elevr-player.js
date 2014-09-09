@@ -49,9 +49,9 @@ var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
     deviceAlpha, deviceBeta, deviceGamma,
     deviceRotation = quat.create(),
     degtorad = Math.PI / 180, // Degree-to-Radian conversion
-
     prevFrameTime = null,
-    showTiming = false;  // Switch to true to show frame times in the console
+    showTiming = false,  // Switch to true to show frame times in the console
+    framesSinceIssue = 0;
 
 var ProjectionEnum = Object.freeze({
                   EQUIRECT: 0,
@@ -188,15 +188,22 @@ function initTextures() {
 }
 
 function setCanvasSize() {
-    var screenWidth = window.innerWidth;
-    var screenHeight = window.innerHeight;
-    if (canvas.width != screenWidth || canvas.height != screenHeight) {
-      canvas.width = screenWidth;
-      canvas.height = screenHeight;
+  var screenWidth;
+  var screenHeight;
 
-      canvas.style.width = screenWidth + 'px';
-      canvas.style.height = screenHeight + 'px';
-    }
+  if (typeof vrHMD !== 'undefined' && typeof util.isFullscreen() !== 'undefined' && util.isFullscreen()) {
+    var rectHalf = vrHMD.getRecommendedEyeRenderRect('right');
+    screenWidth = rectHalf.width * 2;
+    screenHeight = rectHalf.height;
+
+    canvas.width = screenWidth;
+    canvas.height = screenHeight;
+
+    canvas.style.width = screenWidth + 'px';
+    canvas.style.height = screenHeight + 'px';
+  } else {
+    screenWidth = window.innerWidth;
+    screenHeight = window.innerHeight;
 
     // query the various pixel ratios
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -207,18 +214,14 @@ function setCanvasSize() {
                             gl.backingStorePixelRatio || 1;
     var ratio = devicePixelRatio / backingStoreRatio;
 
-    // upscale the canvas if the two ratios don't match
-    if (devicePixelRatio !== backingStoreRatio) {
+    if (canvas.width != screenWidth * ratio || canvas.height != screenHeight * ratio) {
+        canvas.width = screenWidth * ratio;
+        canvas.height = screenHeight * ratio;
 
-        var oldWidth = canvas.width;
-        var oldHeight = canvas.height;
-
-        canvas.width = oldWidth * ratio;
-        canvas.height = oldHeight * ratio;
-
-        canvas.style.width = oldWidth + 'px';
-        canvas.style.height = oldHeight + 'px';
+        canvas.style.width = screenWidth + 'px';
+        canvas.style.height = screenHeight + 'px';
     }
+  }
 }
 
 function updateTexture() {
@@ -319,6 +322,12 @@ function drawScene(frameTime) {
   if (showTiming)
     var start = performance.now();
 
+  setCanvasSize();
+
+  if (showTiming){
+    var canvasResized = performance.now();
+  }
+
   updateTexture();
 
   if (showTiming){
@@ -374,21 +383,34 @@ function drawScene(frameTime) {
   }
 
   var perspectiveMatrix = mat4.create();
-  var ratio = (canvas.width/2)/canvas.height;
-  mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
-  drawOneEye(0, perspectiveMatrix);
-  drawOneEye(1, perspectiveMatrix);
+  if (typeof vrHMD !== 'undefined') {
+    perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(vrHMD.getCurrentEyeFieldOfView('left'), 0.1, 10);
+    drawOneEye(0, perspectiveMatrix);
+    perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(vrHMD.getCurrentEyeFieldOfView('right'), 0.1, 10);
+    drawOneEye(1, perspectiveMatrix);
+  } else {
+    var ratio = (canvas.width/2)/canvas.height;
+    mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
+    drawOneEye(0, perspectiveMatrix);
+    drawOneEye(1, perspectiveMatrix);
+  }
+
 
   if (showTiming) {
     gl.finish();
     var end = performance.now();
-    console.log('Frame time: ' +
-		(start - frameTime) + 'ms animation frame lag + ' +
-                (textureLoaded - start) + 'ms to load texture + ' +
-                (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
+    if (end - frameTime > 20) {
+      console.log(framesSinceIssue + ' Frame time: ' +
+    	            (start - frameTime) + 'ms animation frame lag + ' +
+                  (canvasResized - start) + 'ms canvas resized + ' +
+                  (textureLoaded - canvasResized) + 'ms to load texture + ' +
+                  (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
+      console.log(canvas.width + ' width ' + canvas.height + 'height');
+      framesSinceIssue = 0;
+    } else {
+      framesSinceIssue++;
+    }
   }
-
-  setCanvasSize();
 
   reqAnimFrameID = requestAnimationFrame(drawScene);
   prevFrameTime = frameTime;
