@@ -19,7 +19,7 @@
 
 "use strict";
 
-var container, canvas, video, playButton, muteButton, fullScreenButton,
+var container, canvas, video, playButton, muteButton, loopButton, fullScreenButton,
     seekBar, videoSelect, projectionSelect,
     leftLoad, rightLoad, leftPlay, rightPlay, playL, playR;
 
@@ -34,7 +34,7 @@ var texture, textureTime;
 
 var mvMatrix, shader;
 
-var stereoRenderer, vrstate, vrloaded = false;
+var vrHMD, vrSensor;
 
 var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
     manualRotation = quat.create(),
@@ -46,12 +46,12 @@ var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
       'q' : {index: 2, sign: -1, active: 0},
       'e' : {index: 2, sign: 1, active: 0},
     },
-    deviceAlpha, deviceBeta, deviceGamma,
-    deviceRotation = quat.create(),
     degtorad = Math.PI / 180, // Degree-to-Radian conversion
-
     prevFrameTime = null,
-    showTiming = false;  // Switch to true to show frame times in the console
+    showTiming = false,  // Switch to true to show frame times in the console
+    framesSinceIssue = 0;
+
+var phoneVR = null;
 
 var ProjectionEnum = Object.freeze({
                   EQUIRECT: 0,
@@ -61,6 +61,7 @@ var ProjectionEnum = Object.freeze({
   videoObjectURL = null;
 
 function runEleVRPlayer() {
+  initWebVR();
 
   initElements();
   createControls();
@@ -72,19 +73,10 @@ function runEleVRPlayer() {
     gl.clearDepth(1.0);
     gl.disable(gl.DEPTH_TEST);
 
-    loadVRJS();
-
     setCanvasSize();
 
-    // Android Controls: Listen for orientation.
-    var degtorad = Math.PI / 180; // Degree-to-Radian conversion
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', function(orientation) {
-        deviceAlpha = orientation.alpha;
-        deviceGamma = orientation.gamma;
-        deviceBeta = orientation.beta;
-      }.bind(this));
-    }
+    if (isPhoneVRAvailable())
+        phoneVR = new PhoneVR();
 
     // Keyboard Controls
     enableKeyControls();
@@ -108,6 +100,12 @@ function runEleVRPlayer() {
 /**
  * Lots of Init Methods
  */
+function initWebVR() {
+  if (navigator.getVRDevices) {
+    navigator.getVRDevices().then(vrDeviceCallback);
+  }
+}
+
 function initElements() {
   container = document.getElementById("video-container");
   container.style.width = window.innerWidth + "px";
@@ -124,6 +122,7 @@ function initElements() {
   playL = document.getElementById("play-l");
   playR = document.getElementById("play-r");
   muteButton = document.getElementById("mute");
+  loopButton = document.getElementById("loop");
   fullScreenButton = document.getElementById("full-screen");
 
   // Sliders
@@ -182,38 +181,47 @@ function initTextures() {
   textureTime = undefined;
 }
 
-function loadVRJS() {
-  vrstate = new vr.State();
-
-  stereoRenderer = new vr.StereoRenderer(gl, {
-    alpha: false,
-    depth: false,
-    stencil: false
-  });
-
-  vr.load(function(error) {
-    if (error) {
-      console.log('vr.js failed to initialize: ', error);
-    }
-    vrloaded = true;
-  });
-}
-
 function setCanvasSize() {
-    // vr.js really wants device pixel size to be 1:1
-    var screenWidth = window.innerWidth;
-    var screenHeight = window.innerHeight;
-    if (canvas.width != screenWidth || canvas.height != screenHeight) {
-      canvas.width = screenWidth;
-      canvas.height = screenHeight;
+  var screenWidth, screenHeight;
+  screenWidth = window.innerWidth;
+  screenHeight = window.innerHeight;
 
-      canvas.style.width = screenWidth + 'px';
-      canvas.style.height = screenHeight + 'px';
+  if (typeof vrHMD !== 'undefined' && typeof util.isFullscreen() !== 'undefined' && util.isFullscreen()) {
+    var canvasWidth, canvasHeight;
 
-      if (vrstate.hmd.present) {
-        loadVRJS();
-      }
+    if (typeof vrHMD.getRecommendedRenderTargetSize !== 'undefined') {
+      var rect = vrHMD.getRecommendedRenderTargetSize();
+      canvasWidth = rect.width;
+      canvasHeight = rect.height;
+    } else if (typeof vrHMD.getRecommendedEyeRenderRect !== 'undefined') {
+      var rectHalf = vrHMD.getRecommendedEyeRenderRect('right');
+      canvasWidth = rectHalf.width * 2;
+      canvasHeight = rectHalf.height;
     }
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    canvas.style.width = screenWidth + 'px';
+    canvas.style.height = screenHeight + 'px';
+  } else {
+    // query the various pixel ratios
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var backingStoreRatio = gl.webkitBackingStorePixelRatio ||
+                            gl.mozBackingStorePixelRatio ||
+                            gl.msBackingStorePixelRatio ||
+                            gl.oBackingStorePixelRatio ||
+                            gl.backingStorePixelRatio || 1;
+    var ratio = devicePixelRatio / backingStoreRatio;
+
+    if (canvas.width != screenWidth * ratio || canvas.height != screenHeight * ratio) {
+        canvas.width = screenWidth * ratio;
+        canvas.height = screenHeight * ratio;
+
+        canvas.style.width = screenWidth + 'px';
+        canvas.style.height = screenHeight + 'px';
+    }
+  }
 }
 
 function updateTexture() {
@@ -223,6 +231,32 @@ function updateTexture() {
       gl.UNSIGNED_BYTE, video);
     gl.bindTexture(gl.TEXTURE_2D, null);
     textureTime = video.currentTime;
+}
+
+function vrDeviceCallback(vrdevs) {
+  for (var i = 0; i < vrdevs.length; ++i) {
+    if (vrdevs[i] instanceof HMDVRDevice) {
+      vrHMD = vrdevs[i];
+      break;
+    }
+  }
+
+  if (!vrHMD)
+    return;
+
+  // Then, find that HMD's position sensor
+  for (var i = 0; i < vrdevs.length; ++i) {
+    if (vrdevs[i] instanceof PositionSensorVRDevice &&
+        vrdevs[i].hardwareUnitId == vrHMD.hardwareUnitId)
+    {
+      vrSensor = vrdevs[i];
+      break;
+    }
+  }
+
+  if (!vrSensor) {
+    alert("Found a HMD, but didn't find its orientation sensor?");
+  }
 }
 
 /**
@@ -244,13 +278,23 @@ function drawOneEye(eye, projectionMatrix) {
 
   var rotation = mat4.create();
 
-  if (vrstate.hmd.present) {
+  if(typeof vrSensor !== 'undefined') {
+    var state = vrSensor.getState();
     var totalRotation = quat.create();
-    quat.multiply(totalRotation, manualRotation, vrstate.hmd.rotation);
+    if (typeof state.orientation !== 'undefined'
+       && state.orientation.x != 0
+       && state.orientation.y != 0
+       && state.orientation.z != 0
+       && state.orientation.w != 0) {
+      var sensorOrientation = new Float32Array([state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w]);
+      quat.multiply(totalRotation, manualRotation, sensorOrientation);
+    } else {
+      totalRotation = manualRotation;
+    }
     mat4.fromQuat(rotation, totalRotation);
-  } else if (deviceAlpha && deviceBeta && deviceGamma) {
+  } else if (phoneVR) {
     var totalRotation = quat.create();
-    quat.multiply(totalRotation, manualRotation, deviceRotation);
+    quat.multiply(totalRotation, manualRotation, phoneVR.rotationQuat());
     mat4.fromQuat(rotation, totalRotation);
   } else {
     mat4.fromQuat(rotation, manualRotation);
@@ -263,12 +307,10 @@ function drawOneEye(eye, projectionMatrix) {
 
   gl.uniformMatrix4fv(shader.uniforms['proj_inv'], false, inv);
 
-  if (!vrstate.hmd.present) {
-    if (eye == 0) { // left eye
-      gl.viewport(0, 0, canvas.width/2, canvas.height);
-    } else { // right eye
-      gl.viewport(canvas.width/2, 0, canvas.width/2, canvas.height);
-    }
+  if (eye == 0) { // left eye
+    gl.viewport(0, 0, canvas.width/2, canvas.height);
+  } else { // right eye
+    gl.viewport(canvas.width/2, 0, canvas.width/2, canvas.height);
   }
 
   // Draw
@@ -280,16 +322,18 @@ function drawScene(frameTime) {
   if (showTiming)
     var start = performance.now();
 
-  updateTexture();
-  if (!vrloaded) {
-    return;
+  setCanvasSize();
+
+  if (showTiming){
+    var canvasResized = performance.now();
   }
+
+  updateTexture();
 
   if (showTiming){
     var textureLoaded = performance.now();
   }
 
-  vr.pollState(vrstate);
   if (prevFrameTime) {
     // Apply manual controls.
     var interval = (frameTime - prevFrameTime) * 0.001;
@@ -299,65 +343,36 @@ function drawScene(frameTime) {
                                  manualRotateRate[2] * interval, 1.0);
     quat.normalize(update, update);
     quat.multiply(manualRotation, manualRotation, update);
-
-    if (deviceAlpha && deviceBeta && deviceGamma) {
-      // Apply device orientation
-      var z = deviceAlpha * degtorad / 2;
-      var x = deviceBeta * degtorad / 2;
-      var y = deviceGamma * degtorad / 2;
-      var cX = Math.cos(x);
-      var cY = Math.cos(y);
-      var cZ = Math.cos(z);
-      var sX = Math.sin(x);
-      var sY = Math.sin(y);
-      var sZ = Math.sin(z);
-
-      // ZXY quaternion construction.
-      var w = cX * cY * cZ - sX * sY * sZ;
-      var x = sX * cY * cZ - cX * sY * sZ;
-      var y = cX * sY * cZ + sX * cY * sZ;
-      var z = cX * cY * sZ + sX * sY * cZ;
-
-      var deviceQuaternion = quat.fromValues(x, y, z, w);
-
-      // Correct for the screen orientation.
-      var screenOrientation = (util.getScreenOrientation() * degtorad)/2;
-      var screenTransform = [0, 0, -Math.sin(screenOrientation), Math.cos(screenOrientation)];
-
-      quat.multiply(deviceRotation, deviceQuaternion, screenTransform);
-
-      // deviceRotation is the quaternion encoding of the transformation
-      // from camera coordinates to world coordinates.  The problem is that
-      // our shader uses conventional OpenGL coordinates
-      // (+x = right, +y = up, +z = backward), but the DeviceOrientation
-      // spec uses different coordinates (+x = East, +y = North, +z = up).
-      // To fix the mismatch, we need to fix this.  We'll arbitrarily choose
-      // North to correspond to -z (the default camera direction).
-      var r22 = Math.sqrt(0.5);
-      quat.multiply(deviceRotation, quat.fromValues(-r22, 0, 0, r22), deviceRotation);
-    }
   }
 
-  if (vrstate.hmd.present) {
-    stereoRenderer.render(vrstate, function(eye) {drawOneEye(eye.viewport[0]*2, eye.projectionMatrix);}, this);
+  var perspectiveMatrix = mat4.create();
+  if (typeof vrHMD !== 'undefined') {
+    perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(vrHMD.getCurrentEyeFieldOfView('left'), 0.1, 10);
+    drawOneEye(0, perspectiveMatrix);
+    perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(vrHMD.getCurrentEyeFieldOfView('right'), 0.1, 10);
+    drawOneEye(1, perspectiveMatrix);
   } else {
-    var perspectiveMatrix = mat4.create();
     var ratio = (canvas.width/2)/canvas.height;
     mat4.perspective(perspectiveMatrix, Math.PI/2, ratio, .1, 10);
     drawOneEye(0, perspectiveMatrix);
     drawOneEye(1, perspectiveMatrix);
   }
 
+
   if (showTiming) {
     gl.finish();
     var end = performance.now();
-    console.log('Frame time: ' +
-		(start - frameTime) + 'ms animation frame lag + ' +
-                (textureLoaded - start) + 'ms to load texture + ' +
-                (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
+    if (end - frameTime > 20) {
+      console.log(framesSinceIssue + ' Frame time: ' +
+    	            (start - frameTime) + 'ms animation frame lag + ' +
+                  (canvasResized - start) + 'ms canvas resized + ' +
+                  (textureLoaded - canvasResized) + 'ms to load texture + ' +
+                  (end - textureLoaded) + 'ms = ' + (end - frameTime) + 'ms');
+      framesSinceIssue = 0;
+    } else {
+      framesSinceIssue++;
+    }
   }
-
-  setCanvasSize();
 
   reqAnimFrameID = requestAnimationFrame(drawScene);
   prevFrameTime = frameTime;
@@ -459,6 +474,7 @@ function play(event) {
     rightPlay.style.display = "none";
 
     playButton.className = "fa fa-pause icon";
+    playButton.title = "Pause";
     reqAnimFrameID = requestAnimationFrame(drawScene);
   }
 }
@@ -466,8 +482,29 @@ function play(event) {
 function pause() {
   video.pause();
   playButton.className = "fa fa-play icon";
+  playButton.title = "Play";
   leftPlay.style.display = "block";
   rightPlay.style.display = "block";
+}
+
+function playPause() {
+  if (video.paused == true) {
+    play();
+  } else {
+    pause();
+  }
+}
+
+function toggleLooping() {
+  if (video.loop == true) {
+    loopButton.className = "fa fa-refresh icon";
+    loopButton.title="Loop Video";
+    video.loop = false;
+  } else {
+    loopButton.className = "fa fa-chain-broken icon";
+    loopButton.title="Stop Looping";
+    video.loop = true;
+  }
 }
 
 function ended() {
@@ -481,11 +518,13 @@ function ended() {
 function mute() {
   video.muted = true;
   muteButton.className = "fa fa-volume-off icon";
+  muteButton.title = "Unmute";
 }
 
 function unmute() {
   video.muted = false;
   muteButton.className = "fa fa-volume-up icon";
+  muteButton.title = "Mute";
 }
 
 function selectLocalVideo() {
@@ -542,12 +581,22 @@ function loadVideo(videoFile) {
 }
 
 function fullscreen() {
-  if (video.requestFullscreen) {
-    container.requestFullscreen();
-  } else if (video.mozRequestFullScreen) {
-    container.mozRequestFullScreen(); // Firefox
-  } else if (video.webkitRequestFullscreen) {
-    container.webkitRequestFullscreen(); // Chrome and Safari
+  if (canvas.mozRequestFullScreen) {
+    canvas.mozRequestFullScreen({ vrDisplay: vrHMD }); // Firefox
+  } else if (canvas.webkitRequestFullscreen) {
+    canvas.webkitRequestFullscreen({ vrDisplay: vrHMD }); // Chrome and Safari
+  } else if (canvas.requestFullScreen){
+    canvas.requestFullscreen();
+  }
+}
+
+function fullscreenIgnoreHMD() {
+  if (canvas.mozRequestFullScreen) {
+    canvas.mozRequestFullScreen(); // Firefox
+  } else if (canvas.webkitRequestFullscreen) {
+    canvas.webkitRequestFullscreen(); // Chrome and Safari
+  } else if (canvas.requestFullScreen){
+    canvas.requestFullscreen();
   }
 }
 
@@ -556,27 +605,19 @@ function fullscreen() {
  */
 function createControls() {
   playButton.addEventListener("click", function() {
-    if (video.paused == true) {
-      play();
-    } else {
-      pause();
-    }
+    playPause();
   });
 
   playL.addEventListener("click", function() {
-    if (video.paused == true) {
-      play();
-    } else {
-      pause();
-    }
+    playPause();
   });
 
   playR.addEventListener("click", function() {
-    if (video.paused == true) {
-      play();
-    } else {
-      pause();
-    }
+    playPause();
+  });
+
+  loopButton.addEventListener("click", function() {
+    toggleLooping();
   });
 
   muteButton.addEventListener("click", function() {
@@ -653,8 +694,29 @@ function enableKeyControls() {
     manualRotateRate[control.index] += sign * control.sign;
   }
 
+  function onkey(event) {
+    switch (String.fromCharCode(event.charCode)) {
+    case 'f':
+      fullscreen();
+      break;
+    case 'z':
+      vrSensor.zeroSensor();
+      break;
+    case 'p':
+      playPause();
+      break;
+    case 'g':
+      fullscreenIgnoreHMD();
+      break;
+    case 'l':
+      toggleLooping();
+      break;
+    }
+  }
+
   document.addEventListener('keydown', function(event) { key(event, 1); },
           false);
   document.addEventListener('keyup', function(event) { key(event, -1); },
           false);
+  window.addEventListener("keypress", onkey, true);
 }
