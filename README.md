@@ -14,7 +14,7 @@ Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, an
 The following table documents the keyboard controls currently available.
 
 | Key | Control           |
-|-----|-------------|
+|:-----:|-------------|
 | p   | play/pause |
 | l   | toggle looping |
 | f   | full screen webVR mode (with barrel distortion) |
