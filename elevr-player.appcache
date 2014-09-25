@@ -1,0 +1,23 @@
+CACHE MANIFEST
+# Version 1
+
+CACHE:
+js/elevr-player.js
+lib/gl-matrix.js
+lib/util.js
+lib/vr.js
+css/elevr-player.css
+css/font-awesome.css
+css/fonts/fontawesome-webfont.woff
+css/fonts/fontawesome-webfont.eot
+css/fonts/fontawesome-webfont.svg
+css/fonts/fontawesome-webfont.ttf
+css/fonts/FontAwesome.otf
+
+
+FALLBACK:
+# This will enable imagename4.png to be as a replacement for
+# all resources under the images dir when there is no network connectivity.
+
+NETWORK:
+# This will prevent other network resources from being accessed.
