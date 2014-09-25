@@ -85,13 +85,9 @@ a:active {
 	bottom: 0;
 	left: 0;
 	right: 0;
+  padding: 0 10px;
   opacity: .9;
-  height: 0px;
-	-webkit-transition: all .4s ease;
-	-moz-transition: all .4s ease;
-	-o-transition: all .4s ease;
-	-ms-transition: all .4s ease;
-	transition: all .4s ease;
+  height: 30px;
   background-color: rgb(237,25,88);
 
   background: -webkit-linear-gradient(left top, rgb(190,25,141), rgb(237,25,88));
@@ -100,27 +96,10 @@ a:active {
   background: linear-gradient(to bottom right, rgb(190,25,141), rgb(237,25,88));
 }
 
-#control-hover-area {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height:80px;
-}
-
-#control-hover-area:hover #video-controls {
-  height: 25px;
-  padding: 5px;
-  -webkit-transition: all .5s ease;
-  -moz-transition: all .5s ease;
-  -o-transition: all .5s ease;
-  -ms-transition: all .5s ease;
-  transition: all .5s ease;
-}
-
 #seek-bar {
 	width: 35%;
   float: left;
+  margin-top: 3px;
 }
 
 select {
@@ -130,10 +109,9 @@ select {
 }
 
 .icon {
-  margin: 0px 5px;
+  margin: 7px 5px 0px 5px;
   width:20px;
   float: left;
-  margin-top: 5px;
 }
 
 .rfloat {

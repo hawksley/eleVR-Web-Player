@@ -122,41 +122,34 @@
         Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
       </canvas>
       <video preload="auto" id="video">
-        <source src="videos/therelaxatron2.mp4" type='video/mp4'>
         <source src="videos/therelaxatron.webm" type='video/webm'>
       </video>
       <!-- Video Controls -->
-      <div id="control-hover-area">
-        <div id="video-controls">
-          <a id="play-pause" class="fa fa-play icon" title="Play"></a>
+      <div id="video-controls">
+        <a id="play-pause" class="fa fa-play icon" title="Play"></a>
 
 
-          <input type="range" id="seek-bar" value="0">
+        <input type="range" id="seek-bar" value="0">
 
-          <a id="loop" class="fa fa-refresh icon" title="Loop Video"></a>
+        <a id="loop" class="fa fa-refresh icon" title="Loop Video"></a>
 
-          <a id="mute" class="fa fa-volume-up icon" title="Mute"></a>
+        <a id="mute" class="fa fa-volume-up icon" title="Mute"></a>
 
-	        <a id="select-local-file" class="fa fa-folder-open icon rfloat" title="Select File"></a>
+        <a id="select-local-file" class="fa fa-folder-open icon rfloat" title="Select File"></a>
 
-          <select id="projection-select" class="rfloat">
-            <option value=0>Equirectangular</option>
-            <option value=1>Equirectangular 3D</option>
-          </select>
+        <select id="projection-select" class="rfloat">
+          <option value=0>Equirectangular</option>
+          <option value=1>Equirectangular 3D</option>
+        </select>
 
-          <select id="video-select" class="rfloat">
-            <option value="0videos/therelaxatron2.mp4">The Relaxatron (mp4)</option>
-            <option value="0videos/therelaxatron.webm">The Relaxatron (webm)</option>
-            <option value="1videos/Vidcon5.mp4">Vidcon (mp4)</option>
-            <option value="1videos/Vidcon.webm">Vidcon (webm)</option>
-            <option value="1videos/iflscience-song2.mp4">Concert Video (mp4)</option>
-            <option value="1videos/iflscience-song2.webm">Concert Video (webm)</option>
-            <option value="1videos/library-gif.mp4">Library GIF (mp4)</option>
-            <option value="1videos/library-gif.webm">Library GIF (webm)</option>
-          </select>
+        <select id="video-select" class="rfloat">
+          <option value="0videos/therelaxatron.webm">The Relaxatron (webm)</option>
+          <option value="1videos/Vidcon.webm">Vidcon (webm)</option>
+          <option value="1videos/iflscience-song2.webm">Concert Video (webm)</option>
+          <option value="1videos/library-gif.webm">Library GIF (webm)</option>
+        </select>
 
-          <a id="full-screen" class="fa fa-expand icon rfloat" title="Full Screen"></a>
-        </div>
+        <a id="full-screen" class="fa fa-expand icon rfloat" title="Full Screen"></a>
       </div>
 
       <script>runEleVRPlayer();</script>
