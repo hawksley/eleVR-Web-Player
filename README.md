@@ -33,7 +33,9 @@ It currently supports spherical video with equirectangular projections and spher
 ### Support ###
 Using keyboard rotation controls, the player works on standard Firefox and Chrome on Windows, Mac, and Linux. It also runs on Safari (if webgl is enabled). I haven't tested it on other browsers.
 
-Using Oculus headset controls, the player works on 
+Using Oculus headset controls, the player works on the experimental webVR builds of [Firefox](http://blog.bitops.com/blog/2014/06/26/first-steps-for-vr-on-the-web/) and [Chromium](https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list).
+
+Using device orientation controls, it has historically worked on Chrome on Android, however Chrome recently hacked a fix to a security issue by marking all video as cross-origin. For more details on the current status on mobile devices, please check out the issues tab.
 
 ## Running your own video ##
 The easiest way to run your own video is to click the folder icon and load your video from there. You may then need to choose the projection for your video from the projection selector.
