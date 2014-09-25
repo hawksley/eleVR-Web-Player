@@ -75,8 +75,7 @@ function runEleVRPlayer() {
 
     setCanvasSize();
 
-    if (isPhoneVRAvailable())
-        phoneVR = new PhoneVR();
+    phoneVR = new PhoneVR();
 
     // Keyboard Controls
     enableKeyControls();
@@ -292,12 +291,10 @@ function drawOneEye(eye, projectionMatrix) {
       totalRotation = manualRotation;
     }
     mat4.fromQuat(rotation, totalRotation);
-  } else if (phoneVR) {
+  } else {
     var totalRotation = quat.create();
     quat.multiply(totalRotation, manualRotation, phoneVR.rotationQuat());
     mat4.fromQuat(rotation, totalRotation);
-  } else {
-    mat4.fromQuat(rotation, manualRotation);
   }
 
   var projectionInverse = mat4.create();

@@ -1,14 +1,13 @@
 "use strict;"
 
-function isPhoneVRAvailable() {
-    return !!window.DeviceOrientationEvent
-	return true;
-}
+// It seems to be impossible to synchronously detect whether we have an orientation sensor.
+// Even Chromium on the desktop has a 'deviceorientation' event, and it will fire once with
+// all nulls.
 
 function PhoneVR() {
-    this.deviceAlpha = 0;
-    this.deviceGamma = 0;
-    this.deviceBeta = 0;
+    this.deviceAlpha = null;
+    this.deviceGamma = null;
+    this.deviceBeta = null;
 
     window.addEventListener('deviceorientation', function(orientation) {
         this.deviceAlpha = orientation.alpha;
@@ -17,7 +16,14 @@ function PhoneVR() {
     }.bind(this));
 }
 
+PhoneVR.prototype.orientationIsAvailable = function() {
+    return this.deviceAlpha !== null;
+}
+
 PhoneVR.prototype.rotationQuat = function() {
+    if (!this.orientationIsAvailable())
+        return quat.create(1, 0, 0, 0);
+
     var degtorad = Math.PI / 180; // Degree-to-Radian conversion
     var z = this.deviceAlpha * degtorad / 2;
     var x = this.deviceBeta * degtorad / 2;
