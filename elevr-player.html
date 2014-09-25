@@ -121,7 +121,8 @@
       <canvas id="glcanvas">
         Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
       </canvas>
-      <video preload="auto" id="video">
+      <video preload="auto" id="video" webkit-playsinline>
+        <source src="videos/therelaxatron2.mp4" type='video/mp4'>
         <source src="videos/therelaxatron.webm" type='video/webm'>
       </video>
       <!-- Video Controls -->
@@ -143,10 +144,14 @@
         </select>
 
         <select id="video-select" class="rfloat">
-          <option value="0videos/therelaxatron.webm">The Relaxatron (webm)</option>
-          <option value="1videos/Vidcon.webm">Vidcon (webm)</option>
-          <option value="1videos/iflscience-song2.webm">Concert Video (webm)</option>
-          <option value="1videos/library-gif.webm">Library GIF (webm)</option>
+            <option value="0videos/therelaxatron2.mp4">The Relaxatron (mp4)</option>
+            <option value="0videos/therelaxatron.webm">The Relaxatron (webm)</option>
+            <option value="1videos/Vidcon5.mp4">Vidcon (mp4)</option>
+            <option value="1videos/Vidcon.webm">Vidcon (webm)</option>
+            <option value="1videos/iflscience-song2.mp4">Concert Video (mp4)</option>
+            <option value="1videos/iflscience-song2.webm">Concert Video (webm)</option>
+            <option value="1videos/library-gif.mp4">Library GIF (mp4)</option>
+            <option value="1videos/library-gif.webm">Library GIF (webm)</option>
         </select>
 
         <a id="full-screen" class="fa fa-expand icon rfloat" title="Full Screen"></a>
