@@ -46,12 +46,12 @@ var manualRotateRate = new Float32Array([0, 0, 0]),  // Vector, camera-relative
       'q' : {index: 2, sign: -1, active: 0},
       'e' : {index: 2, sign: 1, active: 0},
     },
-    deviceAlpha, deviceBeta, deviceGamma,
-    deviceRotation = quat.create(),
     degtorad = Math.PI / 180, // Degree-to-Radian conversion
     prevFrameTime = null,
     showTiming = false,  // Switch to true to show frame times in the console
     framesSinceIssue = 0;
+
+var phoneVR = null;
 
 var ProjectionEnum = Object.freeze({
                   EQUIRECT: 0,
@@ -75,15 +75,8 @@ function runEleVRPlayer() {
 
     setCanvasSize();
 
-    // Android Controls: Listen for orientation.
-    var degtorad = Math.PI / 180; // Degree-to-Radian conversion
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', function(orientation) {
-        deviceAlpha = orientation.alpha;
-        deviceGamma = orientation.gamma;
-        deviceBeta = orientation.beta;
-      }.bind(this));
-    }
+    if (isPhoneVRAvailable())
+        phoneVR = new PhoneVR();
 
     // Keyboard Controls
     enableKeyControls();
@@ -299,9 +292,9 @@ function drawOneEye(eye, projectionMatrix) {
       totalRotation = manualRotation;
     }
     mat4.fromQuat(rotation, totalRotation);
-  }else if (deviceAlpha && deviceBeta && deviceGamma) {
+  } else if (phoneVR) {
     var totalRotation = quat.create();
-    quat.multiply(totalRotation, manualRotation, deviceRotation);
+    quat.multiply(totalRotation, manualRotation, phoneVR.rotationQuat());
     mat4.fromQuat(rotation, totalRotation);
   } else {
     mat4.fromQuat(rotation, manualRotation);
@@ -350,43 +343,6 @@ function drawScene(frameTime) {
                                  manualRotateRate[2] * interval, 1.0);
     quat.normalize(update, update);
     quat.multiply(manualRotation, manualRotation, update);
-
-    if (deviceAlpha && deviceBeta && deviceGamma) {
-      // Apply device orientation
-      var z = deviceAlpha * degtorad / 2;
-      var x = deviceBeta * degtorad / 2;
-      var y = deviceGamma * degtorad / 2;
-      var cX = Math.cos(x);
-      var cY = Math.cos(y);
-      var cZ = Math.cos(z);
-      var sX = Math.sin(x);
-      var sY = Math.sin(y);
-      var sZ = Math.sin(z);
-
-      // ZXY quaternion construction.
-      var w = cX * cY * cZ - sX * sY * sZ;
-      var x = sX * cY * cZ - cX * sY * sZ;
-      var y = cX * sY * cZ + sX * cY * sZ;
-      var z = cX * cY * sZ + sX * sY * cZ;
-
-      var deviceQuaternion = quat.fromValues(x, y, z, w);
-
-      // Correct for the screen orientation.
-      var screenOrientation = (util.getScreenOrientation() * degtorad)/2;
-      var screenTransform = [0, 0, -Math.sin(screenOrientation), Math.cos(screenOrientation)];
-
-      quat.multiply(deviceRotation, deviceQuaternion, screenTransform);
-
-      // deviceRotation is the quaternion encoding of the transformation
-      // from camera coordinates to world coordinates.  The problem is that
-      // our shader uses conventional OpenGL coordinates
-      // (+x = right, +y = up, +z = backward), but the DeviceOrientation
-      // spec uses different coordinates (+x = East, +y = North, +z = up).
-      // To fix the mismatch, we need to fix this.  We'll arbitrarily choose
-      // North to correspond to -z (the default camera direction).
-      var r22 = Math.sqrt(0.5);
-      quat.multiply(deviceRotation, quat.fromValues(-r22, 0, 0, r22), deviceRotation);
-    }
   }
 
   var perspectiveMatrix = mat4.create();
