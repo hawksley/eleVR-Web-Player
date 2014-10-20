@@ -7,7 +7,7 @@ eleVR Web Player works with the native browser support currently being implement
 
 The player depends on the open source libraries as noted in the [3rd Party Libraries](https://github.com/hawksley/eleVR-Web-Player/blob/master/README.md#3rd-party-libraries) section. With the advent of (experimental) direct webVR support by Firefox and Chromium, the player no longer depends on the vr.js plugin.
 
-Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift if you are running an experimental webVR browser.
+Videos shown in the player can be rotated using keyboard controls  (a/d, w/s, and q/e), as well as by the Oculus Rift if you are running an experimental webVR browser. You may be able to decrease video judder by setting your Oculus Display refresh rate to 60 Hz (the browser refreshes at 60 Hz and the slower mismatch can cause judder).
 
 #### [Go check out the demo!](http://hawksley.github.io/eleVR-Web-Player/) ####
 
