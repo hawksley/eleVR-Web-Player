@@ -1,4 +1,4 @@
-"use strict;"
+"use strict";
 
 // It seems to be impossible to synchronously detect whether we have an orientation sensor.
 // Even Chromium on the desktop has a 'deviceorientation' event, and it will fire once with
