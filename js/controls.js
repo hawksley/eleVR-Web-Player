@@ -229,7 +229,7 @@ var manualRotation = quat.create(),
         videoObjectURL = URL.createObjectURL(files[0]);
         console.log('Loading local file ', files[0].name, ' at URL ', videoObjectURL);
         videoSelect.value = "";
-        loadVideo(videoObjectURL);
+        controls.loadVideo(videoObjectURL);
       });
 
       input.click();
