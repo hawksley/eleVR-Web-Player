@@ -221,9 +221,11 @@ var vrHMD, vrSensor;
 
       var perspectiveMatrix = mat4.create();
       if (typeof vrHMD !== 'undefined') {
-        perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(vrHMD.getCurrentEyeFieldOfView('left'), 0.1, 10);
+        var leftParams = vrHMD.getEyeParameters('left');
+        var rightParams = vrHMD.getEyeParameters('right');
+        perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(leftParams.recommendedFieldOfView, 0.1, 10);
         webGL.drawOneEye(0, perspectiveMatrix);
-        perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(vrHMD.getCurrentEyeFieldOfView('right'), 0.1, 10);
+        perspectiveMatrix = util.mat4PerspectiveFromVRFieldOfView(rightParams.recommendedFieldOfView, 0.1, 10);
         webGL.drawOneEye(1, perspectiveMatrix);
       } else {
         var ratio = (canvas.width/2)/canvas.height;
