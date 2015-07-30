@@ -21,6 +21,15 @@ var vrHMD, vrSensor;
       }
     },
 
+    getPhoneVR: function() {
+      if (!webGL.phoneVR) {
+        // Create once and make it a property on the object for easy lookup later.
+        webGL.phoneVR = new PhoneVR();
+      }
+
+      return webGL.phoneVR;
+    },
+
     initBuffers: function() {
       positionsBuffer = webGL.gl.createBuffer();
       webGL.gl.bindBuffer(webGL.gl.ARRAY_BUFFER, positionsBuffer);
@@ -168,7 +177,7 @@ var vrHMD, vrSensor;
         }
         mat4.fromQuat(rotation, totalRotation);
       } else {
-        quat.multiply(totalRotation, manualRotation, phoneVR.rotationQuat());
+        quat.multiply(totalRotation, manualRotation, webGL.getPhoneVR().rotationQuat());
         mat4.fromQuat(rotation, totalRotation);
       }
 
