@@ -82,7 +82,16 @@ var manualRotation = quat.create(),
       videoSelect.addEventListener("change", function() {
         projection = videoSelect.value[0];
         projectionSelect.value = projection;
+
+        // Remove the hash/querystring if there were custom video parameters.
+        window.history.pushState('', document.title, window.location.pathname);
+
         controls.loadVideo(videoSelect.value.substring(1));
+
+        var selectedOption = videoSelect.options[videoSelect.selectedIndex];
+        if ('autoplay' in selectedOption.dataset) {
+          controls.play();
+        }
       });
 
 
@@ -178,6 +187,13 @@ var manualRotation = quat.create(),
         controls.play();
       } else {
         controls.pause();
+      }
+    },
+
+    setLooping: function(loop) {
+      loop = !!loop;
+      if (video.loop !== loop) {
+        controls.toggleLooping();
       }
     },
 
