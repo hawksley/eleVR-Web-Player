@@ -30,12 +30,6 @@ var timing = {showTiming: false, // Switch to true to show frame times in the co
               framesSinceIssue: 0
               };
 
-var phoneVR = null;
-
-// var ProjectionEnum = Object.freeze({
-//                   EQUIRECT: 0,
-//                   EQUIRECT_3D: 1})
-
 var container, playButton, muteButton, loopButton, fullScreenButton,
     seekBar, videoSelect, projectionSelect, canvas, video,
     leftLoad, rightLoad, leftPlay, rightPlay, playL, playR;
@@ -87,8 +81,6 @@ function runEleVRPlayer() {
     webGL.gl.disable(webGL.gl.DEPTH_TEST);
 
     util.setCanvasSize();
-
-    phoneVR = new PhoneVR();
 
     // Keyboard Controls
     controls.enableKeyControls();
