@@ -140,6 +140,7 @@ function initFromSettings(newSettings) {
     autoplay: undefined,
     controls: true,
     loop: true,
+    sound: true,
     projection: 'mono'
   });
 
@@ -152,6 +153,12 @@ function initFromSettings(newSettings) {
       // `autoplay` by default if controls are hidden and no explicit `autoplay` param set.
       settings.autoplay = true;
     }
+  }
+
+  if (settings.sound) {
+    controls.unmute();
+  } else {
+    controls.mute();
   }
 
   settings.projection = util.getCustomProjection(settings.projection);
@@ -199,12 +206,16 @@ function initFromSettings(newSettings) {
 
   if (settings.autoplay) {
     controls.play();
-  } else {
+  } else if (settings.autoplay === false) {
+    // If user did not explicitly set `autoplay`, don't pause unnecessarily.
     window.video.pause();
   }
 }
 
 window.addEventListener('hashchange', function() {
+  // Remove the querystring if there were custom parameters.
+  window.history.pushState('', document.title, window.location.pathname + window.location.hash);
+
   initFromSettings(window.location.hash);
 });
 
