@@ -35,8 +35,8 @@ select {
   border-radius: 3px;
 }
 
-video {
-  display: none;
+.hidden {
+  display: none !important;
 }
 
 a {

@@ -153,11 +153,11 @@ var manualRotation = quat.create(),
      * Video Commands
      */
     loaded: function() {
-      window.leftLoad.style.display = 'none';
-      window.rightLoad.style.display = 'none';
+      window.leftLoad.classList.add('hidden');
+      window.rightLoad.classList.add('hidden');
       if (video.paused) {
-        window.leftPlay.style.display = 'block';
-        window.rightPlay.style.display = 'block';
+        window.leftPlay.classList.remove('hidden');
+        window.rightPlay.classList.remove('hidden');
       }
     },
 
@@ -168,8 +168,8 @@ var manualRotation = quat.create(),
 
       video.play();
       if (!video.paused) { // In case somehow hitting play button doesn't work.
-        window.leftPlay.style.display = 'none';
-        window.rightPlay.style.display = 'none';
+        window.leftPlay.classList.add('hidden');
+        window.rightPlay.classList.add('hidden');
 
         window.playButton.className = 'fa fa-pause icon';
         window.playButton.title = 'Pause';
@@ -184,8 +184,8 @@ var manualRotation = quat.create(),
       window.playButton.className = 'fa fa-play icon';
       window.playButton.title = 'Play';
 
-      window.leftPlay.style.display = 'block';
-      window.rightPlay.style.display = 'block';
+      window.leftPlay.classList.remove('hidden');
+      window.rightPlay.classList.remove('hidden');
     },
 
     playPause: function() {
@@ -259,10 +259,10 @@ var manualRotation = quat.create(),
 
     loadVideo: function(videoFile) {
       controls.pause();
-      window.leftPlay.style.display = 'none';
-      window.rightPlay.style.display = 'none';
-      window.leftLoad.style.display = 'block';
-      window.rightLoad.style.display = 'block';
+      window.leftPlay.classList.add('hidden');
+      window.rightPlay.classList.add('hidden');
+      window.leftLoad.classList.remove('hidden');
+      window.rightLoad.classList.remove('hidden');
 
       webGL.gl.clear(webGL.gl.COLOR_BUFFER_BIT);
 
@@ -306,6 +306,18 @@ var manualRotation = quat.create(),
       } else if (canvas.requestFullScreen){
         canvas.requestFullscreen();
       }
+    },
+
+    hide: function() {
+      window.videoControls.classList.add('hidden');
+      window.messageL.classList.add('hidden');
+      window.messageR.classList.add('hidden');
+    },
+
+    show: function() {
+      window.videoControls.classList.remove('hidden');
+      window.messageL.classList.remove('hidden');
+      window.messageR.classList.remove('hidden');
     }
   };
 

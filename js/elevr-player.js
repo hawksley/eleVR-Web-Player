@@ -27,13 +27,31 @@ var timing = {showTiming: false, // Switch to true to show frame times in the co
               framesSinceIssue: 0
               };
 
-var videoObjectURL = null;
+var called = {};
 var videoOptions = {};
 
-function initElements() {
-  window.container = document.getElementById('video-container');
+function resizeContainer() {
+  if (!window.container) {
+    window.container = document.getElementById('video-container');
+  }
+
   window.container.style.width = window.innerWidth + 'px';
   window.container.style.height = window.innerHeight + 'px';
+}
+
+window.addEventListener('resize', resizeContainer);
+
+function setupControls() {
+  if (called.setupControls) {
+    return;
+  }
+
+  window.videoControls = document.getElementById('video-controls');
+  window.messageL = document.getElementById('message-l');
+  window.messageR = document.getElementById('message-r');
+
+  resizeContainer();
+
   window.leftLoad = document.getElementById('left-load');
   window.rightLoad = document.getElementById('right-load');
   window.leftPlay = document.getElementById('left-play');
@@ -59,15 +77,22 @@ function initElements() {
   document.getElementById('title-l').style.fontSize = window.outerHeight / 20 + 'px';
   document.getElementById('title-r').style.fontSize = window.outerHeight / 20 + 'px';
 
-  document.getElementById('message-l').style.fontSize = window.outerHeight / 30 + 'px';
-  document.getElementById('message-r').style.fontSize = window.outerHeight / 30 + 'px';
+  window.messageL.style.fontSize = window.outerHeight / 30 + 'px';
+  window.messageR.style.fontSize = window.outerHeight / 30 + 'px';
+
+  controls.create();
+
+  called.setupControls = true;
 }
 
 function runEleVRPlayer() {
-  webVR.initWebVR();
+  if (called.runEleVRPlayer) {
+    return;
+  }
 
-  initElements();
-  controls.create();
+  setupControls();
+
+  webVR.initWebVR();
 
   webGL.initWebGL();
 
@@ -98,25 +123,35 @@ function runEleVRPlayer() {
     Array.prototype.slice.call(window.videoSelect.options).forEach(function(option) {
       videoOptions[option.value] = option;
     });
-
-    initFromSettings(window.location.hash || window.location.search);
   }
+
+  initFromSettings(window.location.hash || window.location.search);
+
+  called.runEleVRPlayer = true;
 }
 
 function initFromSettings(newSettings) {
   if (!newSettings) {
+    controls.show();
     return;
   }
 
   var settings = util.getTruthyURLSearchParams(newSettings, {
-    autoplay: false,
-    projection: 'mono',
-    loop: true
+    autoplay: undefined,
+    controls: true,
+    loop: true,
+    projection: 'mono'
   });
 
-  if (!settings.projection) {
-    // Hack because we coerce '0' to `false` in `util.getTruthyURLSearchParams`.
-    settings.projection = '0';
+  if (settings.controls) {
+    controls.show();
+  } else {
+    controls.hide();
+
+    if (typeof settings.autoplay === 'undefined') {
+      // `autoplay` by default if controls are hidden and no explicit `autoplay` param set.
+      settings.autoplay = true;
+    }
   }
 
   settings.projection = util.getCustomProjection(settings.projection);

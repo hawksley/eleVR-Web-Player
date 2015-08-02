@@ -108,28 +108,28 @@
     <!-- Loading Message -->
     <div id="left-load" class="left">
       <div id="title-l" class="title">Loading Video...</div>
-      <div id="message-l" class="message">Try WASD + Q/E</div>
+      <div id="message-l" class="message hidden">Try WASD + Q/E</div>
     </div>
     <div id="right-load" class="right">
       <div id="title-r" class="title">Loading Video...</div>
-      <div id="message-r" class="message">Try WASD + Q/E</div>
+      <div id="message-r" class="message hidden">Try WASD + Q/E</div>
     </div>
-    <div id="left-play" class="left" style="display:none;">
+    <div id="left-play" class="left hidden">
       <a id="play-l" class="large-play fa fa-play fa-5x"></a>
     </div>
-    <div id="right-play" class="right" style="display:none;">
+    <div id="right-play" class="right hidden">
       <a id="play-r" class="large-play fa fa-play fa-5x"></a>
     </div>
 
     <canvas id="glcanvas">
       Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
     </canvas>
-    <video preload="auto" id="video" loop="true" webkit-playsinline crossOrigin="anonymous">
+    <video class="hidden" preload="auto" id="video" loop="true" webkit-playsinline crossOrigin="anonymous">
       <source src="therelaxatron2.mp4" type="video/mp4">
       <source src="therelaxatron.webm" type="video/webm">
     </video>
         <!-- Video Controls -->
-        <div id="video-controls">
+        <div id="video-controls" class="hidden">
           <a id="play-pause" class="fa fa-play icon" title="Play"></a>
 
 
