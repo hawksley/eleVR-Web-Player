@@ -10,14 +10,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* global controls, projection, util, webGL, webVR */
 
 "use strict";
 
 var currentScreenOrientation = window.orientation || 0; // active default
 
-var lastUpdateTime = 0;
-
-var mvMatrix, shader;
+var shader;
 
 var timing = {showTiming: false, // Switch to true to show frame times in the console
               frameTime: 0,
@@ -34,6 +33,7 @@ var container, playButton, muteButton, loopButton, fullScreenButton,
     seekBar, videoSelect, projectionSelect, canvas, video,
     leftLoad, rightLoad, leftPlay, rightPlay, playL, playR;
 var videoObjectURL = null;
+var videoOptions = {};
 
 function initElements() {
   container = document.getElementById("video-container");
@@ -97,5 +97,92 @@ function runEleVRPlayer() {
 
     video.addEventListener("canplaythrough", controls.loaded);
     video.addEventListener("ended", controls.ended);
+
+    // Keep a record of all the videos that are in the drop-down menu.
+    Array.prototype.slice.call(videoSelect.options).forEach(function(option) {
+      videoOptions[option.value] = option;
+    });
+
+    initFromSettings(window.location.hash || window.location.search);
   }
 }
+
+function initFromSettings(newSettings) {
+  if (!newSettings) {
+    return;
+  }
+
+  var settings = util.getTruthyURLSearchParams(newSettings, {
+    autoplay: false,
+    projection: 'mono',
+    loop: true
+  });
+
+  if (!settings.projection) {
+    // Hack because we coerce '0' to `false` in `util.getTruthyURLSearchParams`.
+    settings.projection = '0';
+  }
+
+  settings.projection = util.getCustomProjection(settings.projection);
+
+  if (projection !== settings.projection) {
+    projection = settings.projection;
+
+    if (projectionSelect) {
+      projectionSelect.value = settings.projection;
+    }
+  }
+
+  controls.setLooping(settings.loop);
+
+  if (settings.video) {
+    video.innerHTML = '';
+
+    if (videoSelect) {
+      var optionValue = settings.projection + settings.video;
+
+      if (optionValue in videoOptions) {
+        videoOptions[optionValue].selected = true;
+      } else {
+        var option = document.createElement('option');
+        option.selected = true;
+        option.textContent = settings.title || util.getVideoTitle(settings.video);
+
+        // Note: The controls code expects the filename to be prefixed with '0' or '1'.
+        option.value = optionValue;
+
+        if (settings.autoplay) {
+          option.dataset.autoplay = '';
+        } else {
+          delete option.dataset.autoplay;
+        }
+
+        videoOptions[optionValue] = option;
+
+        videoSelect.appendChild(option);
+      }
+    }
+
+    controls.loadVideo(settings.video);
+  }
+
+  if (settings.autoplay) {
+    controls.play();
+  } else {
+    video.pause();
+  }
+}
+
+window.addEventListener('hashchange', function() {
+  initFromSettings(window.location.hash);
+});
+
+window.addEventListener('message', function(e) {
+  if (typeof e.data === 'object') {
+    window.location.hash = '#' + JSON.stringify(e.data);
+  } else if (typeof e.data === 'string') {
+    window.location.hash = '#' + e.data;
+  } else {
+    return;
+  }
+});
