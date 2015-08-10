@@ -47,6 +47,31 @@ If you want to add your video to the drop-down, create a new option in the html 
 
 If you want your video to be the video loaded initially, change the source of the video in the html video tag. You can also update the starting projection, if necessary, by changing the value of the "projection" variable on instantiation (and also changing the default value of the projection-select html select tag.
 
+### Ability to load external video URLs (via querystring, hash, postMessage) ###
+
+Query-string key-value params:
+[`http://localhost:8080/?autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
+
+Hash key-value params:
+[`http://localhost:8080/#video=http://cdn2.vrideo.com/prod_videos/v1/W7JUlEW_480p_full.mp4`](http://localhost:8080/#video=http://cdn2.vrideo.com/prod_videos/v1/W7JUlEW_480p_full.mp4)
+
+Query-string JSON params:
+[`http://localhost:8080/?{"video": "http://cdn2.vrideo.com/prod_videos/v1/3aM7Xd6_1080p_full.webm", "autoplay": "true", "projection": "mono"}`](http://localhost:8080/?{"video": "http://cdn2.vrideo.com/prod_videos/v1/3aM7Xd6_1080p_full.webm", "autoplay": "true", "projection": "mono"})
+
+Hash JSON params:
+[`http://localhost:8080/#{"autoplay": true, "video": "http://crossorigin.me/http://mobile.360heros.com/producers/4630608605686575/5579686187673361/video/video_7776b10db31f349ede5d253b7744e110.mp4"}`](http://localhost:8080/#{"autoplay": true, "video": "http://crossorigin.me/http://mobile.360heros.com/producers/4630608605686575/5579686187673361/video/video_7776b10db31f349ede5d253b7744e110.mp4"})
+
+`postMessage` to the page from the JS console:
+```
+window.postMessage({video: 'http://cdn2.vrideo.com/prod_videos/v1/mYNVcD6_480p_full.mp4', autoplay: true, loop: true}, '*')
+```
+
+`postMessage` from an iframe:
+```
+data:text/html,<iframe id='i' src='http://localhost:8080' style='border: 0; position: absolute; left: 0; top: 0; height: 100%; width: 100%' allowfullscreen></iframe><script>setTimeout(function () { i.contentWindow.postMessage({video: 'http://cdn2.vrideo.com/prod_videos/v1/mYNVcD6_480p_full.mp4', autoplay: true, loop: true}, '*'); }, 300);</script>
+```
+
+
 ## Possible Issues and Resolutions ##
 ###Unable to play video###
 If you download and run the code yourself, you need to serve the content to localhost before you can view video (due to _cross origin issues_). 
