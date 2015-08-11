@@ -12,11 +12,9 @@
  */
 /* global controls, projection, util, webGL, webVR */
 
-"use strict";
+'use strict';
 
 var currentScreenOrientation = window.orientation || 0; // active default
-
-var shader;
 
 var timing = {showTiming: false, // Switch to true to show frame times in the console
               frameTime: 0,
@@ -29,40 +27,38 @@ var timing = {showTiming: false, // Switch to true to show frame times in the co
               framesSinceIssue: 0
               };
 
-var container, playButton, muteButton, loopButton, fullScreenButton,
-    seekBar, videoSelect, projectionSelect, canvas, video,
-    leftLoad, rightLoad, leftPlay, rightPlay, playL, playR;
 var videoObjectURL = null;
 var videoOptions = {};
 
 function initElements() {
-  container = document.getElementById("video-container");
-  container.style.width = window.innerWidth + "px";
-  container.style.height = window.innerHeight + "px";
-  leftLoad = document.getElementById("left-load");
-  rightLoad = document.getElementById("right-load");
-  leftPlay = document.getElementById("left-play");
-  rightPlay = document.getElementById("right-play");
-  canvas = document.getElementById("glcanvas");
-  video = document.getElementById("video");
+  window.container = document.getElementById('video-container');
+  window.container.style.width = window.innerWidth + 'px';
+  window.container.style.height = window.innerHeight + 'px';
+  window.leftLoad = document.getElementById('left-load');
+  window.rightLoad = document.getElementById('right-load');
+  window.leftPlay = document.getElementById('left-play');
+  window.rightPlay = document.getElementById('right-play');
+  window.canvas = document.getElementById('glcanvas');
+  window.video = document.getElementById('video');
 
   // Buttons
-  playButton = document.getElementById("play-pause");
-  playL = document.getElementById("play-l");
-  playR = document.getElementById("play-r");
-  muteButton = document.getElementById("mute");
-  loopButton = document.getElementById("loop");
-  fullScreenButton = document.getElementById("full-screen");
+  window.playButton = document.getElementById('play-pause');
+  window.playL = document.getElementById('play-l');
+  window.playR = document.getElementById('play-r');
+  window.muteButton = document.getElementById('mute');
+  window.loopButton = document.getElementById('loop');
+  window.fullScreenButton = document.getElementById('full-screen');
 
   // Sliders
-  seekBar = document.getElementById("seek-bar");
+  window.seekBar = document.getElementById('seek-bar');
 
   // Selectors
-  videoSelect = document.getElementById("video-select");
-  projectionSelect = document.getElementById("projection-select");
+  window.videoSelect = document.getElementById('video-select');
+  window.projectionSelect = document.getElementById('projection-select');
 
   document.getElementById('title-l').style.fontSize = window.outerHeight / 20 + 'px';
   document.getElementById('title-r').style.fontSize = window.outerHeight / 20 + 'px';
+
   document.getElementById('message-l').style.fontSize = window.outerHeight / 30 + 'px';
   document.getElementById('message-r').style.fontSize = window.outerHeight / 30 + 'px';
 }
@@ -85,7 +81,7 @@ function runEleVRPlayer() {
     // Keyboard Controls
     controls.enableKeyControls();
 
-    shader = new webGL.Shader({
+    window.shader = new webGL.Shader({
       fragmentShaderName: 'shader-fs',
       vertexShaderName: 'shader-vs',
       attributes: ['aVertexPosition'],
@@ -95,11 +91,11 @@ function runEleVRPlayer() {
     webGL.initBuffers();
     webGL.initTextures();
 
-    video.addEventListener("canplaythrough", controls.loaded);
-    video.addEventListener("ended", controls.ended);
+    window.video.addEventListener('canplaythrough', controls.loaded);
+    window.video.addEventListener('ended', controls.ended);
 
     // Keep a record of all the videos that are in the drop-down menu.
-    Array.prototype.slice.call(videoSelect.options).forEach(function(option) {
+    Array.prototype.slice.call(window.videoSelect.options).forEach(function(option) {
       videoOptions[option.value] = option;
     });
 
@@ -128,17 +124,17 @@ function initFromSettings(newSettings) {
   if (projection !== settings.projection) {
     projection = settings.projection;
 
-    if (projectionSelect) {
-      projectionSelect.value = settings.projection;
+    if (window.projectionSelect) {
+      window.projectionSelect.value = settings.projection;
     }
   }
 
   controls.setLooping(settings.loop);
 
   if (settings.video) {
-    video.innerHTML = '';
+    window.video.innerHTML = '';
 
-    if (videoSelect) {
+    if (window.videoSelect) {
       var optionValue = settings.projection + settings.video;
 
       if (optionValue in videoOptions) {
@@ -159,7 +155,7 @@ function initFromSettings(newSettings) {
 
         videoOptions[optionValue] = option;
 
-        videoSelect.appendChild(option);
+        window.videoSelect.appendChild(option);
       }
     }
 
@@ -169,7 +165,7 @@ function initFromSettings(newSettings) {
   if (settings.autoplay) {
     controls.play();
   } else {
-    video.pause();
+    window.video.pause();
   }
 }
 
