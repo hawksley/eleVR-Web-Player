@@ -53,16 +53,16 @@ If you want your video to be the video loaded initially, change the source of th
 ### Ability to load external video URLs (via query string, hash, postMessage) ###
 
 Query-string key-value params:
-[`http://localhost:8080/?autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
+[`http://player.elevr.com/?autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
 
 Hash key-value params:
-[`http://localhost:8080/#video=http://cdn2.vrideo.com/prod_videos/v1/W7JUlEW_480p_full.mp4`](http://localhost:8080/#video=http://cdn2.vrideo.com/prod_videos/v1/W7JUlEW_480p_full.mp4)
+[`http://player.elevr.com/#video=http://cdn2.vrideo.com/prod_videos/v1/W7JUlEW_480p_full.mp4`](http://localhost:8080/#video=http://cdn2.vrideo.com/prod_videos/v1/W7JUlEW_480p_full.mp4)
 
 Query-string JSON params:
-[`http://localhost:8080/?{"video": "http://cdn2.vrideo.com/prod_videos/v1/3aM7Xd6_1080p_full.webm", "autoplay": "true", "projection": "mono"}`](http://localhost:8080/?{"video": "http://cdn2.vrideo.com/prod_videos/v1/3aM7Xd6_1080p_full.webm", "autoplay": "true", "projection": "mono"})
+[`http://player.elevr.com/?{"video": "http://cdn2.vrideo.com/prod_videos/v1/3aM7Xd6_1080p_full.webm", "autoplay": "true", "projection": "mono"}`](http://localhost:8080/?{"video": "http://cdn2.vrideo.com/prod_videos/v1/3aM7Xd6_1080p_full.webm", "autoplay": "true", "projection": "mono"})
 
 Hash JSON params:
-[`http://localhost:8080/#{"autoplay": true, "video": "http://crossorigin.me/http://mobile.360heros.com/producers/4630608605686575/5579686187673361/video/video_7776b10db31f349ede5d253b7744e110.mp4"}`](http://localhost:8080/#{"autoplay": true, "video": "http://crossorigin.me/http://mobile.360heros.com/producers/4630608605686575/5579686187673361/video/video_7776b10db31f349ede5d253b7744e110.mp4"})
+[`http://player.elevr.com/#{"autoplay": true, "video": "http://crossorigin.me/http://mobile.360heros.com/producers/4630608605686575/5579686187673361/video/video_7776b10db31f349ede5d253b7744e110.mp4"}`](http://localhost:8080/#{"autoplay": true, "video": "http://crossorigin.me/http://mobile.360heros.com/producers/4630608605686575/5579686187673361/video/video_7776b10db31f349ede5d253b7744e110.mp4"})
 
 `postMessage` to the page from the JS console:
 ```
@@ -78,7 +78,7 @@ data:text/html,<iframe id='i' src='http://localhost:8080' style='border: 0; posi
 
 Query-string key-value params:
 
-[`http://localhost:8080/?controls=0&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?controls=0&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
+[`http://player.elevr.com/?controls=0&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?controls=0&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
 
 `postMessage` to the page from the JS console (or from an iframe):
 
@@ -92,7 +92,7 @@ If `autoplay` is not explicitly passed as a parameter, `autoplay` is enabled by 
 
 Query-string key-value params:
 
-[`http://localhost:8080/?sound=0&autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?sound=0&autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
+[`http://player.elevr.com/?sound=0&autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?sound=0&autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
 
 `postMessage` to the page from the JS console (or from an iframe):
 
