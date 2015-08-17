@@ -88,6 +88,18 @@ window.postMessage({controls: false}, '*')
 
 If `autoplay` is not explicitly passed as a parameter, `autoplay` is enabled by default when video controls are hidden (i.e., `controls` is falsy).
 
+### Ability to mute/unmute sound ###
+
+Query-string key-value params:
+
+[`http://localhost:8080/?sound=0&autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm`](http://localhost:8080/?sound=0&autoplay=1&video=http://cdn2.vrideo.com/prod_videos/v1/lSPg9ka_1080p_full.webm)
+
+`postMessage` to the page from the JS console (or from an iframe):
+
+```js
+window.postMessage({sound: 0}, '*')
+```
+
 ## Possible Issues and Resolutions ##
 ###Unable to play video###
 If you download and run the code yourself, you need to serve the content to localhost before you can view video (due to _cross origin issues_).

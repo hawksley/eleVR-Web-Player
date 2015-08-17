@@ -224,12 +224,18 @@ var manualRotation = quat.create(),
     },
 
     mute: function() {
+      if (video.muted) {
+        return;
+      }
       video.muted = true;
       window.muteButton.className = 'fa fa-volume-off icon';
       window.muteButton.title = 'Unmute';
     },
 
     unmute: function() {
+      if (!video.muted) {
+        return;
+      }
       video.muted = false;
       window.muteButton.className = 'fa fa-volume-up icon';
       window.muteButton.title = 'Mute';
