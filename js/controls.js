@@ -241,7 +241,7 @@ var manualRotation = quat.create(),
       }
     },
 
-    mute: function () {
+    mute: function (){
       if (video.muted) {
         return;
       }
@@ -252,7 +252,7 @@ var manualRotation = quat.create(),
       window.volumeButton.title = 0;
     },
 
-    unmute: function () {
+    unmute: function() {
       if (!video.muted) {
         return;
       }
