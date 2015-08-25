@@ -102,6 +102,11 @@ a:active {
   margin-top: 3px;
 }
 
+#volume-bar {
+    width: 70px;
+    margin-top: 6px;
+}
+
 select {
   width: 12%;
   max-width: 300px;

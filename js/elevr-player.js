@@ -63,12 +63,13 @@ function setupControls() {
   window.playButton = document.getElementById('play-pause');
   window.playL = document.getElementById('play-l');
   window.playR = document.getElementById('play-r');
-  window.muteButton = document.getElementById('mute');
+  window.volumeButton = document.getElementById('volume');
   window.loopButton = document.getElementById('loop');
   window.fullScreenButton = document.getElementById('full-screen');
 
   // Sliders
   window.seekBar = document.getElementById('seek-bar');
+  window.volumeBar = document.getElementById('volume-bar');
 
   // Selectors
   window.videoSelect = document.getElementById('video-select');
