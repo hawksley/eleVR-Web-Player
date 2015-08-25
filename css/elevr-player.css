@@ -103,8 +103,8 @@ a:active {
 }
 
 #volume-bar {
-    width: 70px;
-    margin-top: 6px;
+  width: 70px;
+  margin-top: 3px;
 }
 
 select {
