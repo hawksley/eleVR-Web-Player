@@ -51,6 +51,15 @@ var manualRotation = quat.create(),
         controls.fullscreen();
       });
 
+      recenterButton.addEventListener('click', function() {
+        if (typeof vrSensor !== 'undefined') {
+          vrSensor.zeroSensor(); // Untested
+        }
+        else {
+          quat.invert(manualRotation, webGL.getPhoneVR().rotationQuat());
+        }
+      });
+
       seekBar.addEventListener('change', function() {
         // Calculate the new time
         var time = video.duration * (seekBar.value / 100);
@@ -125,7 +134,12 @@ var manualRotation = quat.create(),
           controls.fullscreen();
           break;
         case 'z':
-          vrSensor.zeroSensor();
+          if (typeof vrSensor !== 'undefined') {
+            vrSensor.zeroSensor();
+          }
+          else {
+            quat.invert(manualRotation, webGL.getPhoneVR().rotationQuat());
+          }
           break;
         case 'p':
           controls.playPause();

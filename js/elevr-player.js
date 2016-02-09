@@ -65,6 +65,7 @@ function setupControls() {
   window.playR = document.getElementById('play-r');
   window.muteButton = document.getElementById('mute');
   window.loopButton = document.getElementById('loop');
+  window.recenterButton = document.getElementById('recenter');
   window.fullScreenButton = document.getElementById('full-screen');
 
   // Sliders
