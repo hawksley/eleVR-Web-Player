@@ -174,7 +174,9 @@ var manualRotation = quat.create(),
         window.playButton.className = 'fa fa-pause icon';
         window.playButton.title = 'Pause';
 
-        reqAnimFrameID = requestAnimationFrame(webGL.drawScene);
+        if (!reqAnimFrameID) {
+          reqAnimFrameID = requestAnimationFrame(webGL.drawScene);
+        }
       }
     },
 
