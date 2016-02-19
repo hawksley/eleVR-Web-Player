@@ -39,7 +39,7 @@ var manualRotation = quat.create(),
         controls.toggleLooping();
       });
 
-      muteButton.addEventListener('click', function() {
+      volumeButton.addEventListener('click', function () {
         if (video.muted === false) {
           controls.mute();
         } else {
@@ -88,6 +88,24 @@ var manualRotation = quat.create(),
       seekBar.addEventListener('mouseup', function() {
         if (tempPause) {
           video.play();
+        }
+      });
+
+      volumeBar.addEventListener('change', function () {
+        video.volume = volumeBar.value;
+        var vol = video.volume;
+        window.volumeButton.title = vol;
+        if(vol>=0.5){
+          window.volumeButton.className = 'fa fa-volume-up icon';
+          video.muted = false;
+        }
+        if(vol<0.5){
+          window.volumeButton.className = 'fa fa-volume-down icon';
+          video.muted = false;
+        }
+        if(vol==0){
+          window.volumeButton.className = 'fa fa-volume-off icon';
+          video.muted = true;
         }
       });
 
@@ -239,13 +257,15 @@ var manualRotation = quat.create(),
       }
     },
 
-    mute: function() {
+    mute: function (){
       if (video.muted) {
         return;
       }
       video.muted = true;
-      window.muteButton.className = 'fa fa-volume-off icon';
-      window.muteButton.title = 'Unmute';
+      video.volume = 0;
+      window.volumeBar.value = 0;
+      window.volumeButton.className = 'fa fa-volume-off icon';
+      window.volumeButton.title = 0;
     },
 
     unmute: function() {
@@ -253,8 +273,10 @@ var manualRotation = quat.create(),
         return;
       }
       video.muted = false;
-      window.muteButton.className = 'fa fa-volume-up icon';
-      window.muteButton.title = 'Mute';
+      video.volume = 1;
+      window.volumeBar.value = 1;
+      window.volumeButton.className = 'fa fa-volume-up icon';
+      window.volumeButton.title = 1;
     },
 
     selectLocalVideo: function() {
