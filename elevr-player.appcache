@@ -6,13 +6,13 @@ js/elevr-player.js
 lib/gl-matrix.js
 lib/util.js
 lib/vr.js
-css/elevr-player.css
-css/font-awesome.css
-css/fonts/fontawesome-webfont.woff
-css/fonts/fontawesome-webfont.eot
-css/fonts/fontawesome-webfont.svg
-css/fonts/fontawesome-webfont.ttf
-css/fonts/FontAwesome.otf
+styles/css/elevr-player.css
+styles/css/font-awesome.css
+styles/css/fonts/fontawesome-webfont.woff
+styles/css/fonts/fontawesome-webfont.eot
+styles/css/fonts/fontawesome-webfont.svg
+styles/css/fonts/fontawesome-webfont.ttf
+styles/css/fonts/FontAwesome.otf
 
 
 FALLBACK:
