@@ -1,5 +1,20 @@
 .DS_Store
-*.mp4
-*.orig
-*.webm
 .jshintrc
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+
+# Dependency directories
+node_modules
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+#ignore CNAME to publish forks on gh-pages
+CNAME
