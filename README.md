@@ -101,15 +101,15 @@ window.postMessage({sound: 0}, '*')
 ```
 
 ## Possible Issues and Resolutions ##
-###Unable to play video###
+### Unable to play video ###
 If you download and run the code yourself, you need to serve the content to localhost before you can view video (due to _cross origin issues_).
 
 Similarly, if you try to run your own video, you may run into __cross origin__ issues if your video is not at the same origin the player. Take a look at [this doc](https://developer.mozilla.org/en-US/docs/Web/WebGL/Cross-Domain_Textures) from mozilla if you run into these issues.
 
 You may also run into issues playing video if your browser does not support HTML5 video of the type that you are using. For example, Firefox on Mac does not support mp4 video, but does support webm. You can check what video types are supported for your browser here: http://en.wikipedia.org/wiki/HTML5_video#Browser_support
-###Broken Time Slider in Chrome###
+### Broken Time Slider in Chrome ###
 For the time slider to work in Chrome, you must use a server that understands __partial content requests__. Many of the most basic ways of serving to localhost do not.
-###Oculus movement isn't being recognized###
+### Oculus movement isn't being recognized ###
 Make sure that you are using an experimental webVR version of the browser. If it still isn't being recognized, you can try restarting the browser and plugging/unplugging your device.
 
 ## Future Work ##
